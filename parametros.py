@@ -22,14 +22,14 @@ class Parametros:
             elif par == "-q":
                 self.enumSalida = EnumSalida.Ninguna
                 cargando = ""
-            elif par == "-H" or par == "-p" or par == "-s" or par == "-n":
+            elif par == "-H" or par == "-p" or par == "-s" or par == "-d" or par == "-n":
                 cargando = par
             else:
                 if cargando == "-H":
                     self.IP = par
                 elif cargando == "-p":
                     self.port = par
-                elif cargando == "-s":
+                elif cargando == "-s" or cargando == "-s":
                     self.path = par
                 elif cargando == "-n":
                     self.filename = par

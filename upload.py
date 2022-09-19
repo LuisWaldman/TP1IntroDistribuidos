@@ -5,6 +5,8 @@ from parametros import *
 
 param = Parametros(sys.argv)
 if param.mostrarayuda:
+    print("usage : upload [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ] [ - s FILEPATH ] [ - n FILENAME ]")
+    print("")
     print("< command description >")
     print("")
     print("optional arguments :")
