@@ -1,4 +1,6 @@
-from socket import *
+from socket import socket, AF_INET, SOCK_DGRAM
+
+
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(("", serverPort))

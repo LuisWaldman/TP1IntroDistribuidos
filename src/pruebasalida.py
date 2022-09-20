@@ -1,4 +1,6 @@
-from salida import *
+from salida import Salida, EnumSalida
+
+
 print("Ninguna")
 salida = Salida(EnumSalida.Ninguna)
 salida.Info("Info")

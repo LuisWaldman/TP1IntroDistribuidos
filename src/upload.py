@@ -1,6 +1,6 @@
 import sys
-from salida import *
-from parametros import *
+from salida import Salida
+from parametros import Parametros
 
 
 param = Parametros(sys.argv)
@@ -24,9 +24,7 @@ salida = Salida(param.enumSalida)
 salida.Info("Muestra informacion")
 salida.Verborragica("Muestra verborragica")
 
-
 print("IP:", param.IP)
 print("port:", param.port)
 print("path:", param.path)
 print("filename:", param.filename)
-

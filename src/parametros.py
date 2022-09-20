@@ -1,5 +1,7 @@
 
-from salida import *
+from salida import EnumSalida
+
+
 class Parametros:
     mostrarayuda = False
     enumSalida = EnumSalida.Informacion
@@ -7,7 +9,6 @@ class Parametros:
     port = 10666
     path = ""
     filename = ""
-
 
     def __init__(self, parametros):
         cargando = ""
