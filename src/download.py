@@ -1,11 +1,14 @@
 import sys
-from salida import *
-from parametros import *
+from src.salida import Salida
+from src.parametros import Parametros
 
 
 param = Parametros(sys.argv)
-if param.mostrarayuda:
-    print("usage : download [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ] [ - d FILEPATH ] [ - n FILENAME ]")
+if param.mostrar_ayuda:
+    print(
+        "usage : download [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ]"
+        "[ - d FILEPATH ] [ - n FILENAME ]"
+    )
     print("")
     print("< command description >")
     print("")
@@ -17,15 +20,14 @@ if param.mostrarayuda:
     print("-p , -- port server port")
     print("-d , -- dst destination file path")
     print("-n , -- name file name")
-    exit(0)
+    sys.exit()
 
-salida = Salida(param.enumSalida)
-salida.Info("Muestra informacion")
-salida.Verborragica("Muestra verborragica")
+salida = Salida(param.enum_salida)
+salida.info("Muestra informacion")
+salida.verborragica("Muestra verborragica")
 
 
-print("IP:", param.IP)
 print("port:", param.port)
+print("IP:", param.ip)
 print("path:", param.path)
 print("filename:", param.filename)
-
