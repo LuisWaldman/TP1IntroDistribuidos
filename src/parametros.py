@@ -1,11 +1,11 @@
 
-from salida import EnumSalida
+from src.salida import EnumSalida
 
 
 class Parametros:
-    mostrarayuda = False
-    enumSalida = EnumSalida.Informacion
-    IP = "localhost"
+    mostrar_ayuda = False
+    enum_salida = EnumSalida.INFORMACION
+    ip = "localhost"
     port = 10666
     path = ""
     filename = ""
@@ -15,22 +15,22 @@ class Parametros:
 
         for par in parametros:
             if par == "-h":
-                self.mostrarayuda = True
+                self.mostrar_ayuda = True
                 cargando = ""
             elif par == "-v":
-                self.enumSalida = EnumSalida.Verborragica
+                self.enum_salida = EnumSalida.VERBORRAGICA
                 cargando = ""
             elif par == "-q":
-                self.enumSalida = EnumSalida.Ninguna
+                self.enum_salida = EnumSalida.NINGUNA
                 cargando = ""
-            elif par == "-H" or par == "-p" or par == "-s" or par == "-d" or par == "-n":
+            elif par in ('-H', '-p', '-s', '-n'):
                 cargando = par
             else:
                 if cargando == "-H":
-                    self.IP = par
+                    self.ip = par
                 elif cargando == "-p":
                     self.port = par
-                elif cargando == "-s" or cargando == "-s":
+                elif cargando == "-s":
                     self.path = par
                 elif cargando == "-n":
                     self.filename = par

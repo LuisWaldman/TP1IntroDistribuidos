@@ -2,21 +2,21 @@ import enum
 
 
 class EnumSalida(enum.Enum):
-    Ninguna = 1
-    Informacion = 2
-    Verborragica = 3
+    NINGUNA = 1
+    INFORMACION = 2
+    VERBORRAGICA = 3
 
 
 class Salida:
-    enumsalida = EnumSalida.Informacion
+    enumsalida = EnumSalida.INFORMACION
 
-    def __init__(self, penumSalida):
-        self.enumsalida = penumSalida
+    def __init__(self, penum_salida):
+        self.enumsalida = penum_salida
 
-    def Info(self, mensaje):
-        if self.enumsalida != EnumSalida.Ninguna:
+    def info(self, mensaje):
+        if self.enumsalida != EnumSalida.NINGUNA:
             print(mensaje)
 
-    def Verborragica(self, mensaje):
-        if self.enumsalida == EnumSalida.Verborragica:
+    def verborragica(self, mensaje):
+        if self.enumsalida == EnumSalida.VERBORRAGICA:
             print(mensaje)

@@ -1,11 +1,12 @@
 from socket import AF_INET, SOCK_DGRAM, socket
 
 
-serverName = "localhost"
-serverPort = 12000
-clientSocket = socket(AF_INET, SOCK_DGRAM)
-message = "mi frase miniscula"
-clientSocket.sendto(message.encode(), (serverName, serverPort))
-modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
-print(modifiedMessage.decode())
-clientSocket.close()
+SERVER_NAME = "localhost"
+SERVER_PORT = 12000
+CLIENT_SOCKET = socket(AF_INET, SOCK_DGRAM)
+MESSAGE = "mi frase miniscula"
+
+CLIENT_SOCKET.sendto(MESSAGE.encode(), (SERVER_NAME, SERVER_PORT))
+modified_message, serverAddress = CLIENT_SOCKET.recvfrom(2048)
+print(modified_message.decode())
+CLIENT_SOCKET.close()
