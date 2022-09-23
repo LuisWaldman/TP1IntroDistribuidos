@@ -1,7 +1,10 @@
 import sys
+import yaml
 from salida import *
 from parametros import *
 
+with open('config.yaml', 'r', encoding='utf-8') as yaml_file:
+    configs = yaml.safe_load(yaml_file)
 
 param = Parametros(sys.argv)
 if param.mostrarayuda:

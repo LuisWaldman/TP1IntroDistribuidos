@@ -1,4 +1,8 @@
 from socket import socket, AF_INET, SOCK_DGRAM
+import yaml
+
+with open('config.yaml', 'r', encoding='utf-8') as yaml_file:
+    configs = yaml.safe_load(yaml_file)
 
 
 SERVER_PORT = 12000

@@ -28,3 +28,10 @@ Correr tox:
 ```bash
 tox
 ```
+
+## Instalar pyyalm para el archivo de configuración
+
+```bash
+pip install pyyaml --upgrade
+```
+

@@ -1,3 +1,4 @@
 tox
 pylint
 flake8
+pyyaml
