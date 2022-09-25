@@ -1,5 +1,7 @@
 
-from src.salida import EnumSalida
+from salida import EnumSalida
+
+LEN_IP_ADDR = 4
 
 
 class Parametros:
@@ -9,10 +11,10 @@ class Parametros:
     port = 10666
     path = ""
     filename = ""
+    error = False
 
     def __init__(self, parametros):
         cargando = ""
-
         for par in parametros:
             if par == "-h":
                 self.mostrar_ayuda = True
@@ -34,3 +36,19 @@ class Parametros:
                     self.path = par
                 elif cargando == "-n":
                     self.filename = par
+
+        self.validateIp()
+
+    def validateIp(self):
+        if self.ip == 'localhost':
+            return
+        numbers = self.ip.split('.')
+        if len(numbers) != LEN_IP_ADDR:
+            print('ERROR: IP invalida')
+            self.error = True
+            return
+        for number in numbers:
+            if int(number) < 0 or int(number) > 255:
+                print('ERROR: IP invalida')
+                self.error = True
+                return

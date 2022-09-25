@@ -1,6 +1,6 @@
 import sys
-from src.salida import Salida
-from src.parametros import Parametros
+from salida import Salida
+from parametros import Parametros
 
 
 param = Parametros(sys.argv)
