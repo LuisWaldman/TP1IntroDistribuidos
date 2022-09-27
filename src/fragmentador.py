@@ -1,15 +1,16 @@
 from os import SEEK_END
 from os import SEEK_SET
 
+
 class Fragmentador:
     file = ''
     mss = 1
 
-    def __init__(self, filename, mss):
-        self.file = open(filename, 'rb')
+    def __init__(self, file, mss):
+        self.file = file
         self.mss = mss
 
-    def getBytesFromFile(self, package):
+    def get_bytes_from_file(self, package):
         if package > 0:
             self.file.seek(self.mss*(package-1), SEEK_SET)
             return self.file.read(self.mss)
@@ -18,6 +19,6 @@ class Fragmentador:
     def close(self):
         self.file.close()
 
-    def getTotalSize(self):
+    def get_total_size(self):
         self.file.seek(0, SEEK_END)
         return self.file.tell()
