@@ -4,7 +4,7 @@ from parametros import *
 
 
 param = Parametros(sys.argv)
-if param.mostrarayuda:
+if param.mostrar_ayuda:
     print("usage : download [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ] [ - d FILEPATH ] [ - n FILENAME ]")
     print("")
     print("< command description >")
@@ -19,12 +19,11 @@ if param.mostrarayuda:
     print("-n , -- name file name")
     exit(0)
 
-salida = Salida(param.enumSalida)
-salida.Info("Muestra informacion")
-salida.Verborragica("Muestra verborragica")
+salida = Salida(param.enum_salida)
+salida.info("Muestra informacion")
+salida.verborragica("Muestra verborragica")
 
-
-print("IP:", param.IP)
+print("IP:", param.ip)
 print("port:", param.port)
 print("path:", param.path)
 print("filename:", param.filename)
