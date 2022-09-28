@@ -1,5 +1,5 @@
 
-from src.salida import EnumSalida
+from src.utils.salida import EnumSalida
 import os
 
 LEN_IP_ADDR = 4

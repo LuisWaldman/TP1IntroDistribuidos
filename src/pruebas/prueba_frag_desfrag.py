@@ -1,6 +1,6 @@
 import math
-from src.fragmentador import Fragmentador
-from src.desfragmentador import Desfragmentador
+from src.utils.fragmentador import Fragmentador
+from src.utils.desfragmentador import Desfragmentador
 
 
 def copiar_archivo():

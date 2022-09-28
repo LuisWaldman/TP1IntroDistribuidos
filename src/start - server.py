@@ -1,6 +1,6 @@
 import sys
-from src.salida import *
-from src.parametros import *
+from src.utils.salida import *
+from src.utils.parametros import *
 from src.conexion.Servidor import *
 
 param = Parametros(sys.argv)

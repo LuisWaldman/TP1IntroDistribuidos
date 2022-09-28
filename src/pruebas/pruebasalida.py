@@ -1,4 +1,4 @@
-from src.salida import Salida, EnumSalida
+from src.utils.salida import Salida, EnumSalida
 
 
 print("Ninguna")
