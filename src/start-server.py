@@ -30,7 +30,7 @@ salida.verborragica("path:"+ str(param.path))
 salida.verborragica("filename:" + str(param.filename))
 
 salida.info("Inicio Servidor")
-serverSocket = dsocket(AF_INET, SOCK_DGRAM)
+serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind((param.ip, param.port))
 salida.info("El servidor está listo para recibir")
 while True:
