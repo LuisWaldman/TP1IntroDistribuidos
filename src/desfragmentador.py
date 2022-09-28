@@ -1,17 +1,15 @@
-from os import SEEK_END
-
 class Desfragmentador:
     file = ''
     mss = 1
 
-    def __init__(self, filename, size, mss):
-        self.file = open(filename, "wb")
+    def __init__(self, file, mss):
+        self.file = file
         self.mss = mss
 
-    def setBytesToFile(self, bytes, package):
+    def set_bytes_to_file(self, data, package):
         self.file.seek(0)
         self.file.seek(self.mss * (package - 1))
-        return self.file.write(bytes)
+        return self.file.write(data)
 
     def close(self):
         self.file.close()
