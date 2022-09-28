@@ -1,7 +1,7 @@
 import sys
 from src.salida import *
 from src.parametros import *
-from src.Servidor import *
+from src.conexion.Servidor import *
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -30,5 +30,6 @@ salida.verborragica("path:", param.path)
 salida.verborragica("filename:", param.filename)
 
 salida.info("Inicio Servidor")
+
 servidor = Servidor(param.ip, param.port)
 servidor.escuchar()
