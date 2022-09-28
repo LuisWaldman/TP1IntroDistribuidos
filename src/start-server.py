@@ -1,7 +1,7 @@
 import sys
-from src.utils.salida import *
-from src.utils.parametros import *
-from src.conexion.Servidor import *
+from socket import *
+from utils.salida import *
+from utils.parametros import *
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -24,12 +24,16 @@ elif param.error:
 
 salida = Salida(param.enum_salida)
 
-salida.verborragica("IP:", param.ip)
-salida.verborragica("port:", param.port)
-salida.verborragica("path:", param.path)
-salida.verborragica("filename:", param.filename)
+salida.verborragica("IP:" + str(param.ip))
+salida.verborragica("port:" + str(param.port))
+salida.verborragica("path:"+ str(param.path))
+salida.verborragica("filename:" + str(param.filename))
 
 salida.info("Inicio Servidor")
-
-servidor = Servidor(param.ip, param.port)
-servidor.escuchar()
+serverSocket = dsocket(AF_INET, SOCK_DGRAM)
+serverSocket.bind((param.ip, param.port))
+salida.info("El servidor está listo para recibir")
+while True:
+    message, clientAddress = serverSocket.recvfrom(2048)
+    modifiedMessage = message.decode().upper()
+    serverSocket.sendto(modifiedMessage.encode(), clientAddress)

@@ -1,5 +1,5 @@
+from utils.salida import *
 
-from src.utils.salida import EnumSalida
 import os
 
 LEN_IP_ADDR = 4
@@ -10,7 +10,7 @@ class Parametros:
     enum_salida = EnumSalida.INFORMACION
     ip = "localhost"
     port = 10666
-    path = ""
+    path = "/home"
     filename = ""
     error = False
 
