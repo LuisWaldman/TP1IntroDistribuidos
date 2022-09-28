@@ -1,6 +1,6 @@
 import sys
-from src.salida import Salida
-from src.parametros import Parametros
+from salida import Salida
+from parametros import Parametros
 
 
 param = Parametros(sys.argv)
@@ -19,7 +19,13 @@ if param.mostrar_ayuda:
     print("    -p , -- port server port")
     print("    -s , -- src source file path")
     print("    -n , -- name file name")
-    sys.exit()
+    exit(0)
+elif param.error:
+    print(
+        "usage : upload [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ]"
+        "[ - s FILEPATH ] [ - n FILENAME ]"
+    )
+    exit(0)
 
 salida = Salida(param.enum_salida)
 salida.info("Muestra informacion")
