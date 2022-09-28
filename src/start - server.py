@@ -1,6 +1,7 @@
 import sys
-from salida import *
-from parametros import *
+from src.salida import *
+from src.parametros import *
+from src.Servidor import *
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -22,10 +23,12 @@ elif param.error:
     exit(0)
 
 salida = Salida(param.enum_salida)
-salida.info("Muestra informacion")
-salida.verborragica("Muestra verborragica")
 
-print("IP:", param.ip)
-print("port:", param.port)
-print("path:", param.path)
-print("filename:", param.filename)
+salida.verborragica("IP:", param.ip)
+salida.verborragica("port:", param.port)
+salida.verborragica("path:", param.path)
+salida.verborragica("filename:", param.filename)
+
+salida.info("Inicio Servidor")
+servidor = Servidor(param.ip, param.port)
+servidor.escuchar()
