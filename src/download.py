@@ -1,6 +1,7 @@
 import sys
 from src.utils.salida import *
 from src.utils.parametros import *
+from socket import *
 
 
 param = Parametros(sys.argv)
@@ -19,12 +20,19 @@ if param.mostrar_ayuda:
     print("-n , -- name file name")
     exit(0)
 
+
 salida = Salida(param.enum_salida)
-salida.info("Muestra informacion")
-salida.verborragica("Muestra verborragica")
 
-print("IP:", param.ip)
-print("port:", param.port)
-print("path:", param.path)
-print("filename:", param.filename)
+salida.verborragica("IP:" + str(param.ip))
+salida.verborragica("port:" + str(param.port))
+salida.verborragica("path:"+ str(param.path))
+salida.verborragica("filename:" + str(param.filename))
 
+
+clientSocket = socket(AF_INET, SOCK_DGRAM)
+
+
+clientSocket.sendto(message.encode(), (param.ip, param.port))
+modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
+salida.info(modifiedMessage.decode())
+clientSocket.close()
