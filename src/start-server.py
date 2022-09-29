@@ -2,6 +2,8 @@ import sys
 from socket import *
 from utils.salida import *
 from utils.parametros import *
+from mensajes.mensaje import *
+from utils.Traductor import *
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -35,5 +37,6 @@ serverSocket.bind((param.ip, param.port))
 salida.info("El servidor está listo para recibir")
 while True:
     message, clientAddress = serverSocket.recvfrom(2048)
-    modifiedMessage = message.decode().upper()
-    serverSocket.sendto(modifiedMessage.encode(), clientAddress)
+    mensaje = Traductor.PaqueteAMensaje(message)
+    if (mensaje.tipo == TipoMensaje.HOLA):
+        salida.info("Llego un mensaje para iniciar la comunicacion")

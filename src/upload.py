@@ -2,6 +2,8 @@ import sys
 from utils.salida import *
 from utils.parametros import *
 from socket import *
+from mensajes.mensaje import *
+from utils.Traductor import *
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -36,8 +38,10 @@ salida.verborragica("path:"+ str(param.path))
 salida.verborragica("filename:" + str(param.filename))
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
-message = "mensaje en minucula"
-clientSocket.sendto(message.encode(), (param.ip, param.port))
+
+primermensaje = Mensaje_hola(EnumOperacion.UPLOAD, EnumProtocolo.STOPANDWAIT)
+message = Traductor.MensajeAPaquete(primermensaje)
+clientSocket.sendto(message, (param.ip, param.port))
 modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
 salida.info(modifiedMessage.decode())
 clientSocket.close()

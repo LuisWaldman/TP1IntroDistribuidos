@@ -2,7 +2,8 @@ import sys
 from src.utils.salida import *
 from src.utils.parametros import *
 from socket import *
-
+from src.mensajes.mensaje import *
+from src.utils.Traductor import *
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -31,8 +32,9 @@ salida.verborragica("filename:" + str(param.filename))
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-
-clientSocket.sendto(message.encode(), (param.ip, param.port))
+primermensaje = Mensaje_hola(EnumOperacion.DOWNLOAD, EnumProtocolo.STOPANDWAIT)
+message = Traductor.MensajeAPaquete(primermensaje)
+clientSocket.sendto(message, (param.ip, param.port))
 modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
 salida.info(modifiedMessage.decode())
 clientSocket.close()
