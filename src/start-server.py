@@ -1,13 +1,14 @@
 import sys
-from socket import *
-from utils.salida import *
-from utils.parametros import *
-from mensajes.mensaje import *
-from utils.Traductor import *
+from socket import socket, AF_INET, SOCK_DGRAM
+from src.utils.salida import Salida
+from src.utils.parametros import Parametros
+from src.mensajes.mensaje import TipoMensaje
+from src.utils.Traductor import Traductor
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
-    print("usage : start - server [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ] [ - s DIRPATH ]")
+    print("usage : start - server [ - h ] [ - v | -q ] [ - H ADDR ] "
+          "[ - p PORT ] [ - s DIRPATH ]")
     print("< command description >")
     print("optional arguments :")
     print("-h , -- help show this help message and exit")
@@ -28,7 +29,7 @@ salida = Salida(param.enum_salida)
 
 salida.verborragica("IP:" + str(param.ip))
 salida.verborragica("port:" + str(param.port))
-salida.verborragica("path:"+ str(param.path))
+salida.verborragica("path:" + str(param.path))
 salida.verborragica("filename:" + str(param.filename))
 
 salida.info("Inicio Servidor")

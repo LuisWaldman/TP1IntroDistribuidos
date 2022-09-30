@@ -1,10 +1,10 @@
 import sys
 import math
-from utils.salida import *
-from utils.parametros import *
-from socket import *
-from mensajes.mensaje import *
-from utils.Traductor import *
+from src.utils.salida import Salida
+from src.utils.parametros import Parametros
+from socket import socket, AF_INET, SOCK_DGRAM
+from src.mensajes.mensaje import TipoMensaje, Mensaje
+from src.utils.Traductor import Traductor
 from src.utils.fragmentador import Fragmentador
 
 param = Parametros(sys.argv)
@@ -36,7 +36,7 @@ salida = Salida(param.enum_salida)
 
 salida.verborragica("IP:" + str(param.ip))
 salida.verborragica("port:" + str(param.port))
-salida.verborragica("path:"+ str(param.path))
+salida.verborragica("path:" + str(param.path))
 salida.verborragica("filename:" + str(param.filename))
 
 
@@ -47,7 +47,8 @@ mss = 100
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 salida.info("Iniciando comunicacion STOP & WAIT")
-primermensaje = Mensaje_hola(EnumOperacion.UPLOAD, EnumProtocolo.STOPANDWAIT)
+tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD + TipoMensaje.STOPANDWAIT
+primermensaje = Mensaje(tipo_mensaje, 1, 1, "")
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
 clientSocket.sendto(primerpaquete, (param.ip, param.port))
 terminoarhivo = False
@@ -67,11 +68,11 @@ while parte < num_packages:
     aux = frag.get_bytes_from_file(parte)
     salida.verborragica("Bytes Escritos" + aux)
 
-    mensajeAck = Mensaje_ack(mensajerecibido.parte)
+    mensajeAck = Mensaje(TipoMensaje.ACK, 1, 1, mensajerecibido.parte)
     paqueteack = Traductor.MensajeAPaquete(mensajeAck)
     salida.verborragica("Envia ACK parte" + mensajerecibido.parte)
     clientSocket.sendto(paqueteack, (param.ip, param.port))
-    if mensajerecibido.parte == mensajerecibido.totalpartes:
+    if mensajerecibido.parte == mensajerecibido.total_partes:
         terminoarhivo = True
 
 clientSocket.close()

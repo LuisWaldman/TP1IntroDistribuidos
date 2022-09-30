@@ -1,4 +1,4 @@
-from mensajes.mensaje import Mensaje
+from src.mensajes.mensaje import Mensaje
 
 TAMANIO_BYTE = 256
 
@@ -8,28 +8,27 @@ class Traductor:
     def MensajeAPaquete(mensaje):
         # Cabecera
         tipo_msg = int(mensaje.tipo).to_bytes(1, byteorder='big', signed=False)
-        cantidad_de_partes = int(mensaje.cantidad_de_partes) \
+        total_partes = int(mensaje.total_partes) \
             .to_bytes(1, byteorder='big', signed=False)
-        parte_en_vuelo = int(mensaje.parte_en_vuelo) \
+        parte = int(mensaje.parte) \
             .to_bytes(1, byteorder='big', signed=False)
-        tamanio_playload = int(mensaje.tamanio_playload) \
+        tamanio_payload = int(mensaje.tamanio_payload) \
             .to_bytes(2, byteorder='big', signed=False)
 
-        # Playload MAX 64 KB
-        playload = mensaje.playload.encode('utf-8')
+        # Payload MAX 64 KB
+        payload = mensaje.payload.encode('utf-8')
 
-        return tipo_msg + cantidad_de_partes + parte_en_vuelo + \
-            tamanio_playload + playload
+        return tipo_msg + total_partes + parte + tamanio_payload + payload
 
     @staticmethod
     def PaqueteAMensaje(bytes):
         # Cabecera
         tipo_msg = bytes[0]
-        cantidad_de_partes = bytes[1]
-        parte_en_vuelo = bytes[2]
-        tamanio_playload = bytes[3] * TAMANIO_BYTE + bytes[4]
+        total_partes = bytes[1]
+        parte = bytes[2]
+        tamanio_payload = bytes[3] * TAMANIO_BYTE + bytes[4]
 
-        # Playload MAX 64 KB
-        playload = bytes[5:tamanio_playload+5].decode('utf-8')
+        # Payload MAX 64 KB
+        payload = bytes[5:tamanio_payload+5].decode('utf-8')
 
-        return Mensaje(tipo_msg, cantidad_de_partes, parte_en_vuelo, playload)
+        return Mensaje(tipo_msg, total_partes, parte, payload)

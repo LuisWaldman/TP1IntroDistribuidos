@@ -1,6 +1,7 @@
 import socket
 from .Hilo import Hilo
 
+
 class Servidor:
     BUFER_MAXIMO = 1024
 

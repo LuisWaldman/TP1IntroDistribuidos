@@ -1,16 +1,16 @@
 import sys
-from src.utils.salida import *
-from src.utils.parametros import *
-from socket import *
-from src.mensajes.mensaje import *
-from src.utils.Traductor import *
+from src.utils.salida import Salida
+from src.utils.parametros import Parametros
+from socket import socket, AF_INET, SOCK_DGRAM
+from src.mensajes.mensaje import TipoMensaje, Mensaje
+from src.utils.Traductor import Traductor
 from src.utils.desfragmentador import Desfragmentador
-
 
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
-    print("usage : download [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ] [ - d FILEPATH ] [ - n FILENAME ]")
+    print("usage : download [ - h ] [ - v | -q ] [ - H ADDR ] "
+          "[ - p PORT ] [ - d FILEPATH ] [ - n FILENAME ]")
     print("")
     print("< command description >")
     print("")
@@ -40,7 +40,8 @@ mss = 100
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 salida.info("Iniciando comunicacion STOP & WAIT")
-primermensaje = Mensaje_hola(EnumOperacion.DOWNLOAD, EnumProtocolo.STOPANDWAIT)
+tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
+primermensaje = Mensaje(tipo, 1, 1, "")
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
 clientSocket.sendto(primerpaquete, (param.ip, param.port))
 terminoarhivo = False
@@ -53,14 +54,15 @@ while not terminoarhivo:
     salida.verborragica("paquete recibido")
     mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido)
 
-    aux = desfrag.set_bytes_to_file(mensajerecibido.payload, mensajerecibido.parte)
+    aux = desfrag.set_bytes_to_file(mensajerecibido.payload,
+                                    mensajerecibido.parte)
     salida.verborragica("Bytes Escritos" + aux)
 
-    mensajeAck = Mensaje_ack(mensajerecibido.parte)
+    mensajeAck = Mensaje(TipoMensaje.ACK, 1, 1, mensajerecibido.parte)
     paqueteack = Traductor.MensajeAPaquete(mensajeAck)
     salida.verborragica("Envia ACK parte" + mensajerecibido.parte)
     clientSocket.sendto(paqueteack, (param.ip, param.port))
-    if mensajerecibido.parte == mensajerecibido.totalpartes:
+    if mensajerecibido.parte == mensajerecibido.total_partes:
         terminoarhivo = True
 
 clientSocket.close()

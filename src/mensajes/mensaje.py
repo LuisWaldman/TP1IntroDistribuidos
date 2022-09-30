@@ -20,21 +20,21 @@ class TipoMensaje(enum.IntEnum):
 
 class Mensaje:
     tipo = TipoMensaje.NODEFINIDO
-    cantidad_de_partes = 0
-    parte_en_vuelo = 0
-    tamanio_playload = 0
-    playload = ""
+    total_partes = 0
+    parte = 0
+    tamanio_payload = 0
+    payload = ""
 
     tipo_mensaje = 0
     tipo_operacion = 0
     tipo_protocolo = 0
 
-    def __init__(self, tipo_msg, cantidad_de_partes, parte_en_vuelo, playload):
+    def __init__(self, tipo_msg, total_partes, parte, payload):
         self.tipo = tipo_msg
-        self.cantidad_de_partes = cantidad_de_partes
-        self.parte_en_vuelo = parte_en_vuelo
-        self.playload = playload
-        self.tamanio_playload = len(playload)
+        self.total_partes = total_partes
+        self.parte = parte
+        self.payload = payload
+        self.tamanio_payload = len(payload)
         self.extraer_tipo(tipo_msg)
 
     def extraer_tipo(self, mensaje):
