@@ -4,7 +4,6 @@ from src.utils.parametros import *
 from socket import *
 from src.mensajes.mensaje import *
 from src.utils.Traductor import *
-from src.utils.fragmentador import Fragmentador
 from src.utils.desfragmentador import Desfragmentador
 
 
@@ -30,7 +29,7 @@ salida = Salida(param.enum_salida)
 
 salida.verborragica("IP:" + str(param.ip))
 salida.verborragica("port:" + str(param.port))
-salida.verborragica("path:"+ str(param.path))
+salida.verborragica("path:" + str(param.path))
 salida.verborragica("filename:" + str(param.filename))
 
 
@@ -48,12 +47,13 @@ terminoarhivo = False
 
 desfrag = Desfragmentador(param.filename, mss)
 while not terminoarhivo:
+
     salida.verborragica("esperando paquete ...")
     paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
     salida.verborragica("paquete recibido")
     mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido)
 
-    aux = desfrag.set_bytes_to_file(mensajerecibido.partearchivo, mensajerecibido.parte)
+    aux = desfrag.set_bytes_to_file(mensajerecibido.payload, mensajerecibido.parte)
     salida.verborragica("Bytes Escritos" + aux)
 
     mensajeAck = Mensaje_ack(mensajerecibido.parte)
@@ -62,8 +62,6 @@ while not terminoarhivo:
     clientSocket.sendto(paqueteack, (param.ip, param.port))
     if mensajerecibido.parte == mensajerecibido.totalpartes:
         terminoarhivo = True
-
-
 
 clientSocket.close()
 salida.info("comunicacion terminada")
