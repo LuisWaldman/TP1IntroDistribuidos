@@ -53,26 +53,20 @@ primerpaquete = Traductor.MensajeAPaquete(primermensaje)
 clientSocket.sendto(primerpaquete, (param.ip, param.port))
 terminoarhivo = False
 
-frag = Fragmentador(param.filename, mss)
-parte = 0
-total_size = frag.get_total_size()
-num_packages = math.ceil(total_size / mss)
-while parte < num_packages:
-
-    salida.verborragica("esperando paquete ...")
-    paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
-    salida.verborragica("paquete recibido")
-    mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido)
-
-    aux = frag.get_bytes_from_file(parte)
-    salida.verborragica("Bytes Escritos" + aux)
-
-    mensajeAck = Mensaje(TipoMensaje.ACK, 1, 1, mensajerecibido.parte)
-    paqueteack = Traductor.MensajeAPaquete(mensajeAck)
-    salida.verborragica("Envia ACK parte" + mensajerecibido.parte)
-    clientSocket.sendto(paqueteack, (param.ip, param.port))
-    if mensajerecibido.parte == mensajerecibido.total_partes:
-        terminoarhivo = True
+with open(param.path + param.filename, "rb") as file_origen:
+    frag = Fragmentador(file_origen, param.mss)
+    parte = 1
+    total_size = frag.get_total_size()
+    num_packages = math.ceil(total_size / param.mss)
+    while parte <= num_packages:
+        bytesleidos = frag.get_bytes_from_file(parte)
+        mensajeparte = Mensaje(TipoMensaje.PARTE, num_packages, parte, bytesleidos)
+        paqueteparte = Traductor.MensajeAPaquete(mensajeparte)
+        clientSocket.sendto(paqueteparte, clientAddress)
+        message, clientAddress = clientSocket.recvfrom(2048)
+        mensaje = Traductor.PaqueteAMensaje(message)
+        if mensajeparte.tipo_mensaje == TipoMensaje.ACK:
+            parte = parte + 1
 
 clientSocket.close()
 salida.info("comunicacion terminada")
