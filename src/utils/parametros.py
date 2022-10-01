@@ -1,4 +1,4 @@
-from src.utils.salida import EnumSalida
+from utils.salida import EnumSalida
 
 import os
 

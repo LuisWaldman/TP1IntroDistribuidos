@@ -1,8 +1,9 @@
 import sys
 import math
+from socket import socket, AF_INET, SOCK_DGRAM
+
 from src.utils.salida import Salida
 from src.utils.parametros import Parametros
-from socket import socket, AF_INET, SOCK_DGRAM
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
 from src.utils.fragmentador import Fragmentador

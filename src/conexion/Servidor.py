@@ -1,10 +1,10 @@
 from socket import socket, AF_INET, SOCK_DGRAM
 import threading
 # import pathlib
-from src.mensajes.mensaje import TipoMensaje
-from src.utils.Traductor import Traductor
-from src.utils.salida import Salida
-from src.utils.Archivo import Archivo
+from mensajes.mensaje import TipoMensaje
+from utils.Traductor import Traductor
+from utils.salida import Salida
+from utils.Archivo import Archivo
 
 class Servidor:
     BUFER_MAXIMO = 1024
