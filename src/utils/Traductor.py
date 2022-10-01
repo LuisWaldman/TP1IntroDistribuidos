@@ -1,4 +1,4 @@
-from src.mensajes.mensaje import Mensaje
+from mensajes.mensaje import Mensaje
 
 TAMANIO_BYTE = 256
 
