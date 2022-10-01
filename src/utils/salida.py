@@ -8,15 +8,15 @@ class EnumSalida(enum.Enum):
 
 
 class Salida:
+
     enumsalida = EnumSalida.INFORMACION
 
-    def __init__(self, penum_salida):
-        self.enumsalida = penum_salida
-
-    def info(self, mensaje):
-        if self.enumsalida != EnumSalida.NINGUNA:
+    @staticmethod
+    def info(mensaje):
+        if Salida.enumsalida != EnumSalida.NINGUNA:
             print(mensaje)
 
-    def verborragica(self, mensaje):
-        if self.enumsalida == EnumSalida.VERBORRAGICA:
+    @staticmethod
+    def verborragica(mensaje):
+        if Salida.enumsalida == EnumSalida.VERBORRAGICA:
             print(mensaje)

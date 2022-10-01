@@ -2,7 +2,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 import threading
 from src.mensajes.mensaje import TipoMensaje
 from src.utils.Traductor import Traductor
-
+from src.utils.salida import Salida
 
 class Servidor:
     BUFER_MAXIMO = 1024
@@ -13,6 +13,7 @@ class Servidor:
         self.clientes = list()
 
     def escuchar(self):
+        Salida.info("Escuchando ...")
         while True:
             mensaje, direccion = self.conexion.recvfrom(self.BUFER_MAXIMO)
             if self.nueva_conexion(mensaje, direccion):

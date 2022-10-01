@@ -31,22 +31,21 @@ elif param.error:
     )
     exit(0)
 
+Salida.enumsalida = param.enum_salida
 
-salida = Salida(param.enum_salida)
-
-salida.verborragica("IP:" + str(param.ip))
-salida.verborragica("port:" + str(param.port))
-salida.verborragica("path:" + str(param.path))
-salida.verborragica("filename:" + str(param.filename))
+Salida.verborragica("IP:" + str(param.ip))
+Salida.verborragica("port:" + str(param.port))
+Salida.verborragica("path:" + str(param.path))
+Salida.verborragica("filename:" + str(param.filename))
 
 
-salida.verborragica("Inicio Parametros")
+Salida.verborragica("Inicio Parametros")
 mss = 100
 
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-salida.info("Iniciando comunicacion STOP & WAIT")
+Salida.info("Iniciando comunicacion STOP & WAIT")
 tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD + TipoMensaje.STOPANDWAIT
 primermensaje = Mensaje(tipo_mensaje, 1, 1, "")
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
@@ -69,4 +68,4 @@ with open(param.path + param.filename, "rb") as file_origen:
             parte = parte + 1
 
 clientSocket.close()
-salida.info("comunicacion terminada")
+Salida.info("comunicacion terminada")

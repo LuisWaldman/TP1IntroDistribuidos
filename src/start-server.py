@@ -1,5 +1,5 @@
 import sys
-from src.utils.salida import Salida
+from src.utils.salida import Salida, EnumSalida
 from src.utils.parametros import Parametros
 from src.conexion.Servidor import Servidor
 
@@ -23,12 +23,13 @@ elif param.error:
     )
     exit(0)
 
-salida = Salida(param.enum_salida)
+Salida.enumsalida = param.enum_salida
 
-salida.verborragica("IP:" + str(param.ip))
-salida.verborragica("port:" + str(param.port))
-salida.verborragica("path:" + str(param.path))
-salida.verborragica("filename:" + str(param.filename))
+
+Salida.verborragica("IP:" + str(param.ip))
+Salida.verborragica("port:" + str(param.port))
+Salida.verborragica("path:" + str(param.path))
+Salida.verborragica("filename:" + str(param.filename))
 
 servidor = Servidor(param.ip, param.port)
 servidor.escuchar()
