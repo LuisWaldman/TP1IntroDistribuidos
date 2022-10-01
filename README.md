@@ -1,5 +1,20 @@
 # Introduccion a sistemas distribuidos - TP1
 
+## Configurar PYTHONPATH
+
+Para no tener problemas con los imports. En `~/.bashrc` agregar:
+
+```bash
+export PYTHONPATH=.:/usr/local/lib/python
+```
+
+Validación:
+
+```bash
+$ echo $PYTHONPATH
+.:/usr/local/lib/python
+```
+
 ## Correr linting con tox
 
 Validar que se usa la versión 3.10 de Python:
