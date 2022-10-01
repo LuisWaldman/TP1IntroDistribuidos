@@ -18,25 +18,22 @@ class Servidor:
         Salida.info("Escuchando ...")
         while True:
             mensaje, direccion = self.conexion.recvfrom(self.BUFER_MAXIMO)
-            Salida.verborragica("Mensaje recibido")
-            if self.nueva_conexion(mensaje, direccion):
-                Salida.verborragica("Abriendo hilo para el nuevo cliente")
-                hilo = threading.Thread(target=self.atender_cliente,
-                                        args=(mensaje.decode(), direccion))
-                hilo.start()
+
+            Salida.verborragica("Mensaje recibido. Abriendo hilo para el nuevo cliente")
+
+            hilo = threading.Thread(target=self.atender_cliente,
+                                    args=(mensaje.decode(), direccion))
+            hilo.start()
 
     def nueva_conexion(self, mensaje, direccion):
-        mensaje = Traductor.PaqueteAMensaje(mensaje)
-        (tipo, operacion, protocolo) = self.obtener_tipo_mensaje(mensaje)
-
-        if tipo == TipoMensaje.HOLA:
+        if mensaje.tipo_mensaje == TipoMensaje.HOLA:
             Salida.info("Mensaje recibido para iniciar conexión")
             if direccion in self.clientes:
                 Salida.verborragica("Conexión existente. Desacarto mensaje")
                 return False
 
             src_path = str(pathlib.Path(__file__).parent.parent.absolute())
-            if operacion == TipoMensaje.DOWNLOAD:
+            if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 Salida.verborragica("Conexión de tipo DOWNLOAD")
                 archivo = Archivo(src_path + '/server_files/' + mensaje.payload)
                 if not archivo.existe():
@@ -58,8 +55,7 @@ class Servidor:
         return False
 
     def atender_cliente(self, mensaje, direccion):
-        print('funcionalidad del thread') # todo
+        mensaje = Traductor.PaqueteAMensaje(mensaje)
 
-    def obtener_tipo_mensaje(self, mensaje):
-        tipos_str = str(mensaje.tipo)
-        return (int(tipos_str[0]), int(tipos_str[1])*10, int(tipos_str[2])*100)
+        if self.nueva_conexion(mensaje, direccion):
+            Salida.verborragica("Atendiendo")

@@ -36,7 +36,6 @@ Salida.verborragica("filename:" + str(param.filename))
 Salida.verborragica("Inicio Parametros")
 mss = 100
 
-
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 Salida.info("Iniciando comunicacion STOP & WAIT")
