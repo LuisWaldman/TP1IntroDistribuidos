@@ -31,4 +31,5 @@ salida.verborragica("path:" + str(param.path))
 salida.verborragica("filename:" + str(param.filename))
 
 servidor = Servidor(param.ip, param.port)
+salida.info('Servidor iniciado')
 servidor.escuchar()

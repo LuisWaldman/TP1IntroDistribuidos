@@ -1,0 +1,2 @@
+Archivo de texto de prueba.
+Este archivo es originario del servidor y el cliente va a querer bajarlo.
