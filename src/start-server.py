@@ -1,7 +1,7 @@
 import sys
-from src.utils.salida import Salida, EnumSalida
 from src.utils.parametros import Parametros
 from src.conexion.Servidor import Servidor
+from src.utils.salida import Salida
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
