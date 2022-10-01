@@ -17,10 +17,8 @@ if param.mostrar_ayuda:
     print("-s , -- storage storage dir path")
     exit(0)
 elif param.error:
-    print(
-        "usage : upload [ - h ] [ - v | -q ] [ - H ADDR ] [ - p PORT ]"
-        "[ - s FILEPATH ] [ - n FILENAME ]"
-    )
+    print("usage : start - server [ - h ] [ - v | -q ] [ - H ADDR ] "
+          "[ - p PORT ] [ - s DIRPATH ]")
     exit(0)
 
 Salida.enumsalida = param.enum_salida
@@ -31,6 +29,6 @@ Salida.verborragica("port:" + str(param.port))
 Salida.verborragica("path:" + str(param.path))
 Salida.verborragica("filename:" + str(param.filename))
 
-servidor = Servidor(param.ip, param.port)
+servidor = Servidor(param.ip, param.port, param.path)
 Salida.info('Servidor iniciado')
 servidor.escuchar()
