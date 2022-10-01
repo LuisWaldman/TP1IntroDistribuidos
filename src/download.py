@@ -25,21 +25,21 @@ if param.mostrar_ayuda:
     exit(0)
 
 
-salida = Salida(param.enum_salida)
+Salida.enumsalida = param.enum_salida
 
-salida.verborragica("IP:" + str(param.ip))
-salida.verborragica("port:" + str(param.port))
-salida.verborragica("path:" + str(param.path))
-salida.verborragica("filename:" + str(param.filename))
+Salida.verborragica("IP:" + str(param.ip))
+Salida.verborragica("port:" + str(param.port))
+Salida.verborragica("path:" + str(param.path))
+Salida.verborragica("filename:" + str(param.filename))
 
 
-salida.verborragica("Inicio Parametros")
+Salida.verborragica("Inicio Parametros")
 mss = 100
 
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-salida.info("Iniciando comunicacion STOP & WAIT")
+Salida.info("Iniciando comunicacion STOP & WAIT")
 tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
 primermensaje = Mensaje(tipo, 1, 1, param.filename)
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
@@ -49,21 +49,21 @@ terminoarhivo = False
 desfrag = Desfragmentador(param.filename, mss)
 while not terminoarhivo:
 
-    salida.verborragica("esperando paquete ...")
+    Salida.verborragica("esperando paquete ...")
     paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
-    salida.verborragica("paquete recibido")
+    Salida.verborragica("paquete recibido")
     mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido)
 
     aux = desfrag.set_bytes_to_file(mensajerecibido.payload,
                                     mensajerecibido.parte)
-    salida.verborragica("Bytes Escritos" + aux)
+    Salida.verborragica("Bytes Escritos" + aux)
 
     mensajeAck = Mensaje(TipoMensaje.ACK, 1, 1, mensajerecibido.parte)
     paqueteack = Traductor.MensajeAPaquete(mensajeAck)
-    salida.verborragica("Envia ACK parte" + mensajerecibido.parte)
+    Salida.verborragica("Envia ACK parte" + mensajerecibido.parte)
     clientSocket.sendto(paqueteack, (param.ip, param.port))
     if mensajerecibido.parte == mensajerecibido.total_partes:
         terminoarhivo = True
 
 clientSocket.close()
-salida.info("comunicacion terminada")
+Salida.info("comunicacion terminada")

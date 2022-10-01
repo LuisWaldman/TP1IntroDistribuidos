@@ -2,16 +2,16 @@ from src.utils.salida import Salida, EnumSalida
 
 
 print("Ninguna")
-salida = Salida(EnumSalida.NINGUNA)
-salida.info("Info")
-salida.verborragica("Verbo")
+Salida.enumsalida = EnumSalida.NINGUNA
+Salida.info("Info")
+Salida.verborragica("Verbo")
 
 print("Informacion")
-salida = Salida(EnumSalida.INFORMACION)
-salida.info("Info")
-salida.verborragica("Verbo")
+Salida.enumsalida = EnumSalida.INFORMACION
+Salida.info("Info")
+Salida.verborragica("Verbo")
 
 print("Verborragica")
-salida = Salida(EnumSalida.VERBORRAGICA)
-salida.info("Info")
-salida.verborragica("Verbo")
+Salida.enumsalida = EnumSalida.VERBORRAGICA
+Salida.info("Info")
+Salida.verborragica("Verbo")
