@@ -6,11 +6,13 @@ LEN_IP_ADDR = 4
 
 
 class Parametros:
+    mss = 5000
+
     mostrar_ayuda = False
     enum_salida = EnumSalida.INFORMACION
     ip = "localhost"
     port = 10666
-    path = "/home"
+    path = "/home/luis/repo/"
     filename = ""
     error = False
 
@@ -32,7 +34,7 @@ class Parametros:
                 if cargando == "-H":
                     self.ip = par
                 elif cargando == "-p":
-                    self.port = par
+                    self.port = int(par)
                 elif cargando == "-s" or cargando == "-d":
                     self.path = par
                 elif cargando == "-n":

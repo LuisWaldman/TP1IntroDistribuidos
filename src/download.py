@@ -41,7 +41,7 @@ clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 salida.info("Iniciando comunicacion STOP & WAIT")
 tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
-primermensaje = Mensaje(tipo, 1, 1, "")
+primermensaje = Mensaje(tipo, 1, 1, param.filename)
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
 clientSocket.sendto(primerpaquete, (param.ip, param.port))
 terminoarhivo = False

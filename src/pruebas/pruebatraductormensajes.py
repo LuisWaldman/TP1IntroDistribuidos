@@ -1,6 +1,10 @@
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
 
+mensaje_parte = Mensaje(TipoMensaje.PARTE, 1, 12, "ABCD")
+
+
+
 tipo_msg = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
 total_partes = 1
 parte = 1

@@ -35,7 +35,8 @@ class Mensaje:
         self.parte = parte
         self.payload = payload
         self.tamanio_payload = len(payload)
-        self.extraer_tipo(tipo_msg)
+        if (tipo_msg > 9):
+            self.extraer_tipo(tipo_msg)
 
     def extraer_tipo(self, mensaje):
         mensaje_str = str(mensaje)

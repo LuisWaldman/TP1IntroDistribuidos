@@ -55,7 +55,6 @@ terminoarhivo = False
 
 frag = Fragmentador(param.filename, mss)
 parte = 0
-
 total_size = frag.get_total_size()
 num_packages = math.ceil(total_size / mss)
 while parte < num_packages:
