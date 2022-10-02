@@ -1,5 +1,5 @@
 import sys
-import socket, AF_INET, SOCK_DGRAM
+from socket import socket, AF_INET, SOCK_DGRAM
 import signal
 import logging
 
@@ -10,6 +10,8 @@ from src.utils.Traductor import Traductor
 from src.utils.signal import sigint_exit
 from src.utils.log import set_up_log
 
+TIMEOUT_SEGUNDOS = 2
+INTENTOS_CONEXION = 5
 exit_code = 0
 
 param = Parametros(sys.argv)
@@ -52,24 +54,37 @@ tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD + TipoMensaje.STOPANDWAIT
 print(f'tipo_mensaje: {tipo_mensaje}')
 primer_mensaje = Mensaje(tipo_mensaje, 1, 1, param.filename)
 primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)
-clientSocket.sendto(primer_paquete, (param.ip, param.port))
-termino_archivo = False
 
-logging.debug("Esperando paquete HELLO...")
-paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
-logging.debug("Paquete HELLO recibido")
-mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
+for i in range(0, INTENTOS_CONEXION):
+    try:
+        clientSocket.sendto(primer_paquete, (param.ip, param.port))
+        logging.debug("Esperando paquete HELLO...")
+        clientSocket.settimeout(TIMEOUT_SEGUNDOS)
+
+        paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
+        logging.debug("Paquete HELLO recibido")
+        mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
+        termino_archivo = False
+        break
+
+    except TimeoutError as e:
+        if i < INTENTOS_CONEXION-1:
+            logging.debug("Timeout: reenvio de paquete HELLO...")
+        else:
+            logging.info("No se pudo establecer la conexion")
+            clientSocket.close()
+            exit(5)
 
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     logging.debug("Enviando archivo...")
     emisor = Emisor(clientSocket, param.path + param.filename, serverAddress)
     emisor.enviar_archivo()
-if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
+elif mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
     logging.info("Error: " + mensaje_recibido.payload)
     exit_code = 4
 else:
     logging.info(
-        f"Error: tipo de mensaje {mensaje_recibido.tipo_mensaje} inesperado."
+        f"Error: tipo de mensaje {TipoMensaje(mensaje_recibido.tipo_mensaje).name} inesperado."
     )
     exit_code = 5
 # todo cerrar conexion

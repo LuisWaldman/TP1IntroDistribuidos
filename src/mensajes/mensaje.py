@@ -39,10 +39,10 @@ class Mensaje:
             self.extraer_tipo(tipo_msg)
 
     def __str__(self):
-        return f"Tipo: {self.tipo_mensaje}" +\
-            f"Tipo operacion: {self.tipo_operacion} " +\
-            f"Tipo protocolo: {self.tipo_protocolo} " +\
-            f"Total partes: {self.total_partes} Parte: {self.parte}" +\
+        return f"Tipo: {TipoMensaje(self.tipo_mensaje).name} " +\
+            f"Tipo operacion: {TipoMensaje(self.tipo_operacion).name} " +\
+            f"Tipo protocolo: {TipoMensaje(self.tipo_protocolo).name} " +\
+            f"Total partes: {self.total_partes} Parte: {self.parte} " +\
             f"Tamanio payload: {self.tamanio_payload} Payload: {self.payload}"
 
     def extraer_tipo(self, mensaje):

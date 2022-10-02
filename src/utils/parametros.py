@@ -10,7 +10,7 @@ class Parametros:
     enum_salida = "INFO"
     ip = "localhost"
     port = 10666
-    path = "/home/luis/repo/"
+    path = "."
     filename = ""
     error = False
 
