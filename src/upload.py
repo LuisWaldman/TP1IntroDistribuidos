@@ -78,6 +78,7 @@ if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     logging.debug("Enviando archivo...")
     emisor = Emisor(clientSocket, param.path + param.filename, serverAddress)
     emisor.enviar_archivo()
+    emisor.cerrar_conexion()
 elif mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
     logging.info("Error: " + mensaje_recibido.payload)
     exit_code = 4
