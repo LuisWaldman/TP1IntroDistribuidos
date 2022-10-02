@@ -8,6 +8,7 @@ class TipoMensaje(enum.IntEnum):
     PARTE = 3
     ACK = 4
     ERROR = 5
+    OBTENERLISTADO = 6
 
     # Operacion
     DOWNLOAD = 10
@@ -32,6 +33,8 @@ class Mensaje:
         self.tamanio_payload = len(payload) if payload != None else 0
         if (tipo_msg > 9):
             self.extraer_tipo(tipo_msg)
+        else:
+            self.tipo_mensaje = tipo_msg
 
     def __str__(self):
         return f"Tipo: {TipoMensaje(self.tipo_mensaje).name} " +\

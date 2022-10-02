@@ -62,6 +62,17 @@ class Servidor:
             self.clientes.append(direccion)
             self.lock.release()
             logging.info("Nuevo cliente agregado al servidor")
+
+        elif mensaje.tipo_mensaje == TipoMensaje.OBTENERLISTADO:
+            logging.info("Respondiendo mensaje de obtener listado")
+            tipo = TipoMensaje.PARTE
+            misarchivos = Archivo.Archivos(self.dirpath)
+            mensajelistado = Mensaje(tipo, 1, 1, misarchivos)
+
+            listado_pkg = Traductor.MensajeAPaquete(mensajelistado)
+            socket_listado = socket(AF_INET, SOCK_DGRAM)
+            socket_listado.sendto(listado_pkg, direccion)
+            socket_listado.close()
         else:
             error = "Primer mensaje enviado por un cliente no fue HELLO"
             logging.info(error)
