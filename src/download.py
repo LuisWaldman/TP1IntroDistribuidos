@@ -56,7 +56,7 @@ if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     Salida.verborragica("Recibiendo archivo...")
     receptor = Receptor(clientSocket, param.path + param.filename)
     receptor.recibir_archivo()
-if mensaje_recibido.tipo == TipoMensaje.ERROR:
+if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
     Salida.info("Error: " + mensaje_recibido.payload)
     exit_code = 4
 else:

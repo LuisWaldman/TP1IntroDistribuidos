@@ -30,7 +30,7 @@ class Receptor:
                     paquete_recibido,
                     False
                 )
-                if mensaje_recibido.tipo == TipoMensaje.ERROR:
+                if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
                     Salida.info("Error descargando parte: " + mensaje_recibido.payload)
                     return
 
