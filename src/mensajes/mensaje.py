@@ -13,10 +13,6 @@ class TipoMensaje(enum.IntEnum):
     DOWNLOAD = 10
     UPLOAD = 20
 
-    # Protocolo
-    STOPANDWAIT = 100
-    GBN = 200
-
 
 class Mensaje:
     tipo = TipoMensaje.NODEFINIDO
@@ -27,7 +23,6 @@ class Mensaje:
 
     tipo_mensaje = 0
     tipo_operacion = 0
-    tipo_protocolo = 0
 
     def __init__(self, tipo_msg, total_partes, parte, payload):
         self.tipo = tipo_msg
@@ -41,7 +36,6 @@ class Mensaje:
     def __str__(self):
         return f"Tipo: {TipoMensaje(self.tipo_mensaje).name} " +\
             f"Tipo operacion: {TipoMensaje(self.tipo_operacion).name} " +\
-            f"Tipo protocolo: {TipoMensaje(self.tipo_protocolo).name} " +\
             f"Total partes: {self.total_partes} Parte: {self.parte} " +\
             f"Tamanio payload: {self.tamanio_payload} Payload: {self.payload}"
 
@@ -50,5 +44,3 @@ class Mensaje:
         self.tipo_mensaje = int(mensaje_str[-1])
         if len(mensaje_str) > 1:
             self.tipo_operacion = int(mensaje_str[-2]) * 10
-        if len(mensaje_str) > 2:
-            self.tipo_protocolo = int(mensaje_str[-3]) * 100

@@ -49,7 +49,7 @@ signal.signal(signal.SIGINT, sigint_exit)
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 logging.info("Iniciando comunicación")
-tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
+tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD
 primer_mensaje = Mensaje(tipo, 1, 1, param.filename)
 primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)
 

@@ -28,7 +28,7 @@ class Emisor:
         if self.en_vuelo < self.N and self.package <= num_packages:
             logging.info(f"Enviando paquete numero {self.package}")
             data = frag.get_bytes_from_file(self.package)
-            tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
+            tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD
             logging.debug(f'package {self.package} data size: {len(data)}')
             msg = Mensaje(tipo, num_packages, self.package, data)
             pkg = Traductor.MensajeAPaquete(msg)

@@ -50,7 +50,7 @@ signal.signal(signal.SIGINT, sigint_exit)
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 logging.info("Iniciando comunicacion")
-tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD + TipoMensaje.STOPANDWAIT
+tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD
 print(f'tipo_mensaje: {tipo_mensaje}')
 primer_mensaje = Mensaje(tipo_mensaje, 1, 1, param.filename)
 primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)

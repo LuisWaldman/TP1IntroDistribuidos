@@ -39,8 +39,7 @@ class Receptor:
                 logging.debug(f"Bytes Escritos: {aux}")
 
                 tipo = TipoMensaje.ACK +\
-                    mensaje_recibido.tipo_operacion +\
-                    mensaje_recibido.tipo_protocolo
+                    mensaje_recibido.tipo_operacion
                 mensaje_ack = Mensaje(
                     tipo,
                     mensaje_recibido.total_partes,

@@ -38,7 +38,7 @@ class Servidor:
             self.lock.acquire()
             if direccion in self.clientes:
                 error = "Conexión existente. Desacarto mensaje"
-                logging.info("Conexión existente. Desacarto mensaje")
+                logging.info(error)
                 self.lock.release()
                 raise Exception(error)
             archivo = Archivo(self.dirpath + mensaje.payload)
@@ -78,18 +78,20 @@ class Servidor:
                 logging.info("Atendiendo: cliente=receptor servidor=emisor")
                 emisor = Emisor(socket_atencion, self.dirpath + mensaje.payload, direccion)
                 emisor.enviar_archivo()
+                logging.info("Conexion cerrada")
                 # todo cerrar la conexion
             elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
                 logging.info("Atendiendo: cliente=emisor servidor=receptor")
                 receptor = Receptor(socket_atencion, self.dirpath + mensaje.payload)
                 receptor.recibir_archivo()
+                logging.info("Conexion cerrada")
                 # todo cerrar la conexion
         except Exception as error:
             self.enviar_error(socket_atencion, str(error), direccion)
 
     def responder(self, socket, direccion, tipo_operacion):
         logging.info("Respondiendo mensaje hello")
-        tipo = TipoMensaje.HOLA + tipo_operacion + TipoMensaje.STOPANDWAIT
+        tipo = TipoMensaje.HOLA + tipo_operacion
         hello_response_msg = Mensaje(tipo, 1, 1, None)
         hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
         socket.sendto(hello_response_pkg, direccion)
