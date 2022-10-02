@@ -66,8 +66,8 @@ class Servidor:
             Salida.info(error)
             raise Exception(error)
 
-    def atender_cliente(self, mensaje, direccion):
-        mensaje = Traductor.PaqueteAMensaje(mensaje, True)
+    def atender_cliente(self, paquete, direccion):
+        mensaje = Traductor.PaqueteAMensaje(paquete, True)
 
         socket_atencion = socket(AF_INET, SOCK_DGRAM)
         try:
