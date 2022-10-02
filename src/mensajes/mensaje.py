@@ -19,24 +19,24 @@ class TipoMensaje(enum.IntEnum):
 
 
 class Mensaje:
+    tipo = TipoMensaje.NODEFINIDO
     total_partes = 0
     parte = 0
     tamanio_payload = 0
     payload = ""
 
-    tipo_mensaje = TipoMensaje.NODEFINIDO
+    tipo_mensaje = 0
     tipo_operacion = 0
     tipo_protocolo = 0
 
     def __init__(self, tipo_msg, total_partes, parte, payload):
+        self.tipo = tipo_msg
         self.total_partes = total_partes
         self.parte = parte
         self.payload = payload
         self.tamanio_payload = len(payload) if payload != None else 0
         if (tipo_msg > 9):
             self.extraer_tipo(tipo_msg)
-        else:
-            self.tipo_mensaje = self.tipo_msg
 
     def extraer_tipo(self, mensaje):
         mensaje_str = str(mensaje)
