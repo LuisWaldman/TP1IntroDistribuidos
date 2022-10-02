@@ -10,6 +10,7 @@ from src.utils.Traductor import Traductor
 from src.utils.signal import sigint_exit
 
 MAX_PAYLOAD = 64000
+exit_code = 0
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -40,21 +41,30 @@ signal.signal(signal.SIGINT, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-Salida.info("Iniciando comunicacion")
+Salida.info("Iniciando comunicación")
 tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
-primermensaje = Mensaje(tipo, 1, 1, param.filename)
-primerpaquete = Traductor.MensajeAPaquete(primermensaje)
-clientSocket.sendto(primerpaquete, (param.ip, param.port))
+primer_mensaje = Mensaje(tipo, 1, 1, param.filename)
+primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)
+clientSocket.sendto(primer_paquete, (param.ip, param.port))
 
-Salida.verborragica("esperando respuesta hello ...")
-paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
-Salida.verborragica("paquete recibido")
-mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido, False)
+Salida.verborragica("Esperando paquete HELLO...")
+paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
+Salida.verborragica("Paquete HELLO recibido")
+mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
 
-if(mensajerecibido.tipo_mensaje == TipoMensaje.HOLA):
+if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     Salida.verborragica("recepción de respuesta hello")
     receptor = Receptor(clientSocket, param.path + param.filename)
     receptor.recibir_archivo()
+if mensaje_recibido.tipo == TipoMensaje.ERROR:
+    Salida.info("Error: " + mensaje_recibido.payload)
+    exit_code = 4
+else:
+    Salida.info(
+        "Error: tipo de mensaje {} inesperado.".format(mensaje_recibido.tipo)
+    )
+    exit_code = 5
 
 clientSocket.close()
-Salida.info("comunicacion terminada")
+Salida.info("Comunicación terminada.")
+exit(exit_code)

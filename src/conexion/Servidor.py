@@ -30,50 +30,49 @@ class Servidor:
                                     args=(mensaje, direccion))
             hilo.start()
 
-    def nueva_conexion(self, mensaje, direccion):
+    def assert_message(self, mensaje, direccion):
+        error = ""
         if mensaje.tipo_mensaje == TipoMensaje.HOLA:
             Salida.info("Mensaje recibido para iniciar conexión")
-
             self.lock.acquire()
             if direccion in self.clientes:
+                error = "Conexión existente. Desacarto mensaje"
                 Salida.info("Conexión existente. Desacarto mensaje")
                 self.lock.release()
-                return False
-
+                raise Exception(error)
             archivo = Archivo(self.dirpath + mensaje.payload)
             existe = archivo.existe()
-
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 Salida.info("Conexión de tipo DOWNLOAD")
                 if not existe:
-                    Salida.info("Archivo solicitado inexistente")
+                    error = "El archivo solicitado no existe"
+                    Salida.info(error)
                     self.lock.release()
-                    return False
+                    raise Exception(error)
                 Salida.info("Archivo solicitado existente")
-
             elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
                 Salida.info("Conexión de tipo UPLOAD")
                 if existe:
-                    Salida.info("Archivo ofrecido existente")
+                    error = "El archivo ofrecido existente"
+                    Salida.info(error)
                     self.lock.release()
-                    return False
+                    raise Exception(error)
                 Salida.info("Archivo ofrecido inexistente")
-
             self.clientes.append(direccion)
             self.lock.release()
-
             Salida.info("Nuevo cliente agregado al servidor")
-            return True
-
-        return False
+        else:
+            error = "Primer mensaje enviado por un cliente no fue HELLO"
+            Salida.info(error)
+            raise Exception(error)
 
     def atender_cliente(self, mensaje, direccion):
         mensaje = Traductor.PaqueteAMensaje(mensaje, True)
 
-        if self.nueva_conexion(mensaje, direccion):
-            socket_atencion = socket(AF_INET, SOCK_DGRAM);
+        socket_atencion = socket(AF_INET, SOCK_DGRAM)
+        try:
+            self.assert_message(mensaje, direccion)
             self.responder(socket_atencion, direccion, mensaje.tipo_operacion)
-
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 Salida.info("Atendiendo: cliente=receptor servidor=emisor")
                 emisor = Emisor(socket_atencion, self.dirpath + mensaje.payload, direccion)
@@ -84,10 +83,18 @@ class Servidor:
                 receptor = Receptor(socket_atencion, self.dirpath + mensaje.payload)
                 receptor.recibir_archivo()
                 # todo cerrar la conexion
+        except Exception as error:
+            self.enviar_error(socket_atencion, str(error), direccion)
 
     def responder(self, socket, direccion, tipo_operacion):
         Salida.info("Respondiendo mensaje hello")
         tipo = TipoMensaje.HOLA + tipo_operacion + TipoMensaje.STOPANDWAIT
         hello_response_msg = Mensaje(tipo, 1, 1, None)
+        hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
+        socket.sendto(hello_response_pkg, direccion)
+    
+    def enviar_error(self, socket, error, direccion):
+        Salida.info("Enviando mensaje de error")
+        hello_response_msg = Mensaje(TipoMensaje.ERROR, 1, 1, error)
         hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
         socket.sendto(hello_response_pkg, direccion)
