@@ -61,7 +61,7 @@ if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
     exit_code = 4
 else:
     Salida.info(
-        "Error: tipo de mensaje {} inesperado.".format(mensaje_recibido.tipo)
+        f"Error: tipo de mensaje {mensaje_recibido.tipo_mensaje} inesperado."
     )
     exit_code = 5
 
