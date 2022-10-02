@@ -21,14 +21,15 @@ class Receptor:
 
             while not termino_archivo:
                 logging.debug("Esperando paquete...")
-                paquete_recibido, serverAddress = self.socket.recvfrom(2048)
+                paquete_recibido, serverAddress = self.socket.recvfrom(64010) # todo hace cte (? o traer de archivo conf
                 logging.debug("Paquete recibido")
                 mensaje_recibido = Traductor.PaqueteAMensaje(
                     paquete_recibido,
                     False
                 )
+                logging.debug(f'package {mensaje_recibido.parte} | data size: {len(mensaje_recibido.payload)}')
                 if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
-                    logging.info("Error descargando parte: " + mensaje_recibido.payload)
+                    logging.info("Error descargando parte: " + str(mensaje_recibido.parte))
                     return
 
                 aux = desfragmentador.set_bytes_to_file(

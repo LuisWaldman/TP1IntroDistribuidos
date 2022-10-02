@@ -74,6 +74,7 @@ for i in range(0, INTENTOS_CONEXION):
 
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     logging.debug("Recibiendo archivo...")
+    clientSocket.settimeout(None)
     receptor = Receptor(clientSocket, param.path + param.filename)
     receptor.recibir_archivo()
 elif mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:

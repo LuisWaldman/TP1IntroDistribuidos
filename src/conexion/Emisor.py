@@ -1,12 +1,11 @@
 import math
 import logging
+import threading
 
 from _socket import timeout
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.fragmentador import Fragmentador
 from src.utils.Traductor import Traductor
-import threading
-import time
 
 class Emisor:
     N = 3
@@ -21,18 +20,26 @@ class Emisor:
         self.package = 1
         self.ack_esperado = 1
         self.timeout = False
+        self.en_vuelo = 0
 
 
     def enviar_mensaje(self, frag, num_packages):
         self.lock.acquire()
-        logging.info(f"Enviando paquete numero {self.package}")
-        data = frag.get_bytes_from_file(self.package)
-        tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
-        msg = Mensaje(tipo, num_packages, self.package, data)
-        pkg = Traductor.MensajeAPaquete(msg)
-        logging.debug("Contenido del mensaje: " + str(msg))
-        self.socket.sendto(pkg, self.direccion)
-        self.package += 1
+        if self.package <= num_packages:
+            logging.info(f"Enviando paquete numero {self.package}")
+            data = frag.get_bytes_from_file(self.package)
+            tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
+            logging.debug(f'package {self.package} data size: {len(data)}')
+            msg = Mensaje(tipo, num_packages, self.package, data)
+            pkg = Traductor.MensajeAPaquete(msg)
+            # logging.debug("Contenido del mensaje: " + str(msg))
+            self.socket.sendto(pkg, self.direccion)
+            self.en_vuelo += 1
+            self.package += 1
+        else:
+            self.lock.release()
+            return
+
         self.lock.release()
 
         try:
@@ -46,6 +53,7 @@ class Emisor:
         if mensaje.tipo_mensaje == TipoMensaje.ACK and self.ack_esperado == mensaje.parte:
             logging.info(f"Recibi el ack del paquete {mensaje.parte}")
             self.ack_esperado += 1
+            self.en_vuelo -= 1
         self.lock.release()
 
 
@@ -62,24 +70,18 @@ class Emisor:
 
             hilos_hijos = list()
             while num_packages >= self.ack_esperado:
-                for i in range(self.N):
-                    if self.package <= num_packages:
-                        hilo = threading.Thread(
-                            target=self.enviar_mensaje,
-                            args=(frag, num_packages)
-                        )
-                        hilos_hijos.append(hilo)
-                        hilo.start()
-
-                # TODO: No es una buena idea hacer sleep para sincronizar
-                time.sleep(5)
-                for hilo in hilos_hijos:
-                    # TODO: pensar que si ya uno devuelven bien que envie otro
-                    # TODO: tener algun tipo de contador de vacantes para enviar
-                    hilo.join()
                 if self.timeout:
                     logging.info(f'Timeout paquete {self.ack_esperado}')
                     self.timeout = False
                     self.package = self.ack_esperado
+
+                logging.debug(f'Paquetes en vuelo: {self.en_vuelo} | Prox. paquete a enviar: {self.package} | Total de paquetes: {num_packages}')
+                if self.en_vuelo < self.N and self.package <= num_packages:
+                    hilo = threading.Thread(
+                        target=self.enviar_mensaje,
+                        args=(frag, num_packages)
+                    )
+                    hilos_hijos.append(hilo)
+                    hilo.start()
 
             logging.info('archivo enviado exitosamente')
