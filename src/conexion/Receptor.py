@@ -47,6 +47,7 @@ class Receptor:
                     mensaje_recibido.parte,
                     None
                 )
+                # todo aca habria que chequear que el paquete que espera, sino no mandar ack y descartar
                 paquete_ack = Traductor.MensajeAPaquete(mensaje_ack)
                 logging.debug(f"Envia ACK parte {mensaje_recibido.parte}")
                 self.socket.sendto(paquete_ack, serverAddress)
