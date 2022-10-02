@@ -12,6 +12,7 @@ class Emisor:
     N = 3
     MAX_PAYLOAD = 64000
     MAX_REENVIOS_SEGUIDOS = 20
+    MAX_INTENTOS_CHAU = 5
 
     def __init__(self, socket, file_path, direccion):
         self.file_path = file_path
@@ -95,3 +96,35 @@ class Emisor:
                     hilo.start()
 
             logging.info('archivo enviado exitosamente')
+
+    def cerrar_conexion(self):
+        logging.info("Enviando mensaje CHAU...")
+        conexion_cerrada = False
+        intento = 0
+        while not conexion_cerrada and intento < self.MAX_INTENTOS_CHAU:
+            logging.info(
+                "Enviando mensaje CHAU (intento: "
+                f"{intento}/{self.MAX_INTENTOS_CHAU})..."
+            )
+            msg = Mensaje(TipoMensaje.CHAU, 0, 0, "")
+            pkg = Traductor.MensajeAPaquete(msg)
+            self.socket.sendto(pkg, self.direccion)
+            logging.info("Mensaje CHAU enviado.")
+            logging.info("Esperando ACK...")
+            try:
+                paquete_recibido, __ = self.socket.recvfrom(64010)
+                mensaje_recibido = Traductor.PaqueteAMensaje(
+                    paquete_recibido,
+                    False
+                )
+                if mensaje_recibido.tipo == TipoMensaje.ACK:
+                    conexion_cerrada = True
+                    logging.info("ACK recibido. Conexion cerrada")
+                else:
+                    logging.debug(
+                        f"El tipo de mensaje {mensaje_recibido.tipo} "
+                        "recibido no fue CHAU."
+                    )
+                    intento = intento + 1
+            except timeout:
+                intento = intento + 1

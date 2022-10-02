@@ -76,7 +76,8 @@ if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     logging.debug("Recibiendo archivo...")
     clientSocket.settimeout(None)
     receptor = Receptor(clientSocket, param.path + param.filename)
-    receptor.recibir_archivo()
+    direccion = receptor.recibir_archivo()
+    receptor.esperar_cierre_conexion(direccion)
 elif mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
     logging.info("Error: " + mensaje_recibido.payload)
     exit_code = 4

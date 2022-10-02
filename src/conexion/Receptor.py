@@ -1,4 +1,5 @@
 import logging
+from _socket import timeout
 
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.desfragmentador import Desfragmentador
@@ -6,12 +7,12 @@ from src.utils.Traductor import Traductor
 
 class Receptor:
     MAX_PAYLOAD = 64000
+    MAX_INTENTOS_CHAU = 5
 
     def __init__(self, socket, file_path):
         self.file_path = file_path
         self.socket = socket
         self.package_esperado = 1
-
 
     def recibir_archivo(self):
         termino_archivo = False
@@ -60,3 +61,34 @@ class Receptor:
                 self.socket.sendto(paquete_ack, serverAddress)
                 if mensaje_recibido.parte == mensaje_recibido.total_partes:
                     termino_archivo = True
+                return serverAddress
+
+    def esperar_cierre_conexion(self, direccion):
+        closed = False
+        intento = 0
+        while not closed and intento < self.MAX_INTENTOS_CHAU:
+            logging.info(
+                "Esperando cierre de conexión (intento: "
+                f"{intento}/{self.MAX_INTENTOS_CHAU})..."
+            )
+            try:
+                paquete_recibido, __ = self.socket.recvfrom(64010)
+                mensaje_recibido = Traductor.PaqueteAMensaje(
+                    paquete_recibido,
+                    False
+                )
+                if mensaje_recibido.tipo == TipoMensaje.CHAU:
+                    logging.info("Cierre de conexión recibido.")
+                    closed = True
+                    logging.debug("Enviando ACK...")
+                    msg = Mensaje(TipoMensaje.ACK, 0, 0, "")
+                    pkg = Traductor.MensajeAPaquete(msg)
+                    self.socket.sendto(pkg, direccion)
+                else:
+                    logging.debug(
+                        f"El tipo de mensaje {mensaje_recibido.tipo} "
+                        "recibido no fue CHAU."
+                    )
+                    intento = intento + 1
+            except timeout:
+                intento = intento + 1

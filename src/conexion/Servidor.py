@@ -76,16 +76,20 @@ class Servidor:
             self.responder(socket_atencion, direccion, mensaje.tipo_operacion)
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 logging.info("Atendiendo: cliente=receptor servidor=emisor")
-                emisor = Emisor(socket_atencion, self.dirpath + mensaje.payload, direccion)
+                emisor = Emisor(
+                    socket_atencion, self.dirpath + mensaje.payload, direccion
+                )
                 emisor.enviar_archivo()
-                logging.info("Conexion cerrada")
-                # todo cerrar la conexion
+                emisor.cerrar_conexion()
             elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
                 logging.info("Atendiendo: cliente=emisor servidor=receptor")
-                receptor = Receptor(socket_atencion, self.dirpath + mensaje.payload)
-                receptor.recibir_archivo()
-                logging.info("Conexion cerrada")
-                # todo cerrar la conexion
+                receptor = Receptor(
+                    socket_atencion, self.dirpath + mensaje.payload
+                )
+                direccion_a_cerrar = receptor.recibir_archivo()
+                if not direccion_a_cerrar == direccion:
+                    logging.info(f"{direccion_a_cerrar} != {direccion}")
+                receptor.esperar_cierre_conexion(direccion_a_cerrar)
         except Exception as error:
             self.enviar_error(socket_atencion, str(error), direccion)
 
