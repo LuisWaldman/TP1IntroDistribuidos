@@ -27,9 +27,15 @@ class Receptor:
                     paquete_recibido,
                     False
                 )
+
                 logging.debug(f'package {mensaje_recibido.parte} | data size: {len(mensaje_recibido.payload)}')
+
                 if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
                     logging.info("Error descargando parte: " + str(mensaje_recibido.parte))
+                    return
+
+                if not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte == self.package_esperado):
+                    logging.debug("Descartado parte no esperada: ")
                     return
 
                 aux = desfragmentador.set_bytes_to_file(
@@ -46,7 +52,7 @@ class Receptor:
                     mensaje_recibido.parte,
                     None
                 )
-                # todo aca habria que chequear que el paquete que espera, sino no mandar ack y descartar
+
                 paquete_ack = Traductor.MensajeAPaquete(mensaje_ack)
                 logging.debug(f"Envia ACK parte {mensaje_recibido.parte}")
                 self.socket.sendto(paquete_ack, serverAddress)
