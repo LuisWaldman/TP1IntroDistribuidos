@@ -1,5 +1,3 @@
-from src.utils.salida import EnumSalida
-
 import os
 
 LEN_IP_ADDR = 4
@@ -9,7 +7,7 @@ class Parametros:
     mss = 5000
 
     mostrar_ayuda = False
-    enum_salida = EnumSalida.INFORMACION
+    enum_salida = "INFO"
     ip = "localhost"
     port = 10666
     path = "/home/luis/repo/"
@@ -23,10 +21,10 @@ class Parametros:
                 self.mostrar_ayuda = True
                 cargando = ""
             elif par == "-v":
-                self.enum_salida = EnumSalida.VERBORRAGICA
+                self.enum_salida = "DEBUG"
                 cargando = ""
             elif par == "-q":
-                self.enum_salida = EnumSalida.NINGUNA
+                self.enum_salida = "WARN"
                 cargando = ""
             elif par in ('-H', '-p', '-s', '-d', '-n'):
                 cargando = par

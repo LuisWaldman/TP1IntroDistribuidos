@@ -1,8 +1,9 @@
 import math
+import logging
+
 from _socket import timeout
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.fragmentador import Fragmentador
-from src.utils.salida import Salida
 from src.utils.Traductor import Traductor
 import threading
 import time
@@ -24,12 +25,12 @@ class Emisor:
 
     def enviar_mensaje(self, frag, num_packages):
         self.lock.acquire()
-        Salida.info(f"Enviando paquete numero {self.package}")
+        logging.info(f"Enviando paquete numero {self.package}")
         data = frag.get_bytes_from_file(self.package)
         tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
         msg = Mensaje(tipo, num_packages, self.package, data)
         pkg = Traductor.MensajeAPaquete(msg)
-        Salida.verborragica("Contenido del mensaje: " + str(msg))
+        logging.debug("Contenido del mensaje: " + str(msg))
         self.socket.sendto(pkg, self.direccion)
         self.package += 1
         self.lock.release()
@@ -43,7 +44,7 @@ class Emisor:
         self.lock.acquire()
         mensaje = Traductor.PaqueteAMensaje(message, False)
         if mensaje.tipo_mensaje == TipoMensaje.ACK and self.ack_esperado == mensaje.parte:
-            Salida.info(f"Recibi el ack del paquete {mensaje.parte}")
+            logging.info(f"Recibi el ack del paquete {mensaje.parte}")
             self.ack_esperado += 1
         self.lock.release()
 
@@ -54,8 +55,8 @@ class Emisor:
             total_size = frag.get_total_size()
             num_packages = math.ceil(total_size / self.MAX_PAYLOAD)
 
-            Salida.info(f"Tamanio archivo: {total_size} bytes.")
-            Salida.info(
+            logging.info(f"Tamanio archivo: {total_size} bytes.")
+            logging.info(
                 f"Enviando {num_packages} paquetes de {self.MAX_PAYLOAD} bytes"
             )
 
@@ -77,8 +78,8 @@ class Emisor:
                     # TODO: tener algun tipo de contador de vacantes para enviar
                     hilo.join()
                 if self.timeout:
-                    Salida.info(f'Timeout paquete {self.ack_esperado}')
+                    logging.info(f'Timeout paquete {self.ack_esperado}')
                     self.timeout = False
                     self.package = self.ack_esperado
 
-            Salida.info('archivo enviado exitosamente')
+            logging.info('archivo enviado exitosamente')

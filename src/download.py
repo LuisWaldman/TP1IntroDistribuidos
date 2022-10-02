@@ -1,13 +1,14 @@
 import sys
 import signal
+import logging
 from socket import socket, AF_INET, SOCK_DGRAM
 
 from src.conexion.Receptor import Receptor
-from src.utils.salida import Salida
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
 from src.utils.signal import sigint_exit
+from src.utils.log import set_up_log
 
 MAX_PAYLOAD = 64000
 exit_code = 0
@@ -29,42 +30,41 @@ if param.mostrar_ayuda:
     print("-n , -- name file name")
     exit(0)
 
+set_up_log(param.enum_salida)
 
-Salida.enumsalida = param.enum_salida
-
-Salida.verborragica("IP:" + str(param.ip))
-Salida.verborragica("port:" + str(param.port))
-Salida.verborragica("path:" + str(param.path))
-Salida.verborragica("filename:" + str(param.filename))
+logging.debug("IP:" + str(param.ip))
+logging.debug("port:" + str(param.port))
+logging.debug("path:" + str(param.path))
+logging.debug("filename:" + str(param.filename))
 
 signal.signal(signal.SIGINT, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-Salida.info("Iniciando comunicación")
+logging.info("Iniciando comunicación")
 tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
 primer_mensaje = Mensaje(tipo, 1, 1, param.filename)
 primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)
 clientSocket.sendto(primer_paquete, (param.ip, param.port))
 
-Salida.verborragica("Esperando paquete HELLO...")
+logging.debug("Esperando paquete HELLO...")
 paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
-Salida.verborragica("Paquete HELLO recibido")
+logging.debug("Paquete HELLO recibido")
 mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
 
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
-    Salida.verborragica("Recibiendo archivo...")
+    logging.debug("Recibiendo archivo...")
     receptor = Receptor(clientSocket, param.path + param.filename)
     receptor.recibir_archivo()
 if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
-    Salida.info("Error: " + mensaje_recibido.payload)
+    logging.info("Error: " + mensaje_recibido.payload)
     exit_code = 4
 else:
-    Salida.info(
+    logging.info(
         f"Error: tipo de mensaje {mensaje_recibido.tipo_mensaje} inesperado."
     )
     exit_code = 5
 
 clientSocket.close()
-Salida.info("Comunicación terminada.")
+logging.info("Comunicación terminada.")
 exit(exit_code)

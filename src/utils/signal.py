@@ -1,8 +1,8 @@
 """Signal handler."""
 
-from src.utils.salida import Salida
+import logging
 
 def sigint_exit(signum, frame):
     """Terminate execution with 0 after receiving SIGINT."""
-    Salida.info("Ctrl-c fue presionado. Saliendo...")
+    logging.info("Ctrl-c fue presionado. Saliendo...")
     exit(0)

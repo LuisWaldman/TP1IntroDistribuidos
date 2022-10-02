@@ -1,11 +1,8 @@
-import math
-from _socket import timeout
+import logging
+
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.desfragmentador import Desfragmentador
-from src.utils.fragmentador import Fragmentador
-from src.utils.salida import Salida
 from src.utils.Traductor import Traductor
-import threading
 
 class Receptor:
     MAX_PAYLOAD = 64000
@@ -23,22 +20,22 @@ class Receptor:
             desfragmentador = Desfragmentador(file_destino, self.MAX_PAYLOAD)
 
             while not termino_archivo:
-                Salida.verborragica("Esperando paquete...")
+                logging.debug("Esperando paquete...")
                 paquete_recibido, serverAddress = self.socket.recvfrom(2048)
-                Salida.verborragica("Paquete recibido")
+                logging.debug("Paquete recibido")
                 mensaje_recibido = Traductor.PaqueteAMensaje(
                     paquete_recibido,
                     False
                 )
                 if mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
-                    Salida.info("Error descargando parte: " + mensaje_recibido.payload)
+                    logging.info("Error descargando parte: " + mensaje_recibido.payload)
                     return
 
                 aux = desfragmentador.set_bytes_to_file(
                     mensaje_recibido.payload,
                     mensaje_recibido.parte
                 )
-                Salida.verborragica(f"Bytes Escritos: {aux}")
+                logging.debug(f"Bytes Escritos: {aux}")
 
                 tipo = TipoMensaje.ACK +\
                     mensaje_recibido.tipo_operacion +\
@@ -50,7 +47,7 @@ class Receptor:
                     None
                 )
                 paquete_ack = Traductor.MensajeAPaquete(mensaje_ack)
-                Salida.verborragica(f"Envia ACK parte {mensaje_recibido.parte}")
+                logging.debug(f"Envia ACK parte {mensaje_recibido.parte}")
                 self.socket.sendto(paquete_ack, serverAddress)
                 if mensaje_recibido.parte == mensaje_recibido.total_partes:
                     termino_archivo = True

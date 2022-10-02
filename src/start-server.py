@@ -1,10 +1,11 @@
 import sys
 import signal
+import logging
 
 from src.utils.parametros import Parametros
 from src.conexion.Servidor import Servidor
-from src.utils.salida import Salida
 from src.utils.signal import sigint_exit
+from src.utils.log import set_up_log
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -24,15 +25,14 @@ elif param.error:
           "[ - p PORT ] [ - s DIRPATH ]")
     exit(0)
 
-Salida.enumsalida = param.enum_salida
-
 signal.signal(signal.SIGINT, sigint_exit)
+set_up_log(param.enum_salida)
 
-Salida.verborragica("IP:" + str(param.ip))
-Salida.verborragica("port:" + str(param.port))
-Salida.verborragica("path:" + str(param.path))
-Salida.verborragica("filename:" + str(param.filename))
+logging.debug("IP:" + str(param.ip))
+logging.debug("port:" + str(param.port))
+logging.debug("path:" + str(param.path))
+logging.debug("filename:" + str(param.filename))
 
 servidor = Servidor(param.ip, param.port, param.path)
-Salida.info('Servidor iniciado')
+logging.info('Servidor iniciado')
 servidor.escuchar()
