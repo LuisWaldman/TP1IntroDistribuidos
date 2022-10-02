@@ -32,6 +32,11 @@ if param.mostrar_ayuda:
     print("-n , -- name file name")
     exit(0)
 
+elif param.error:
+    print("usage : download [ - h ] [ - v | -q ] [ - H ADDR ] "
+          "[ - p PORT ] [ - d FILEPATH ] [ - n FILENAME ]")
+    exit(0)
+
 set_up_log(param.enum_salida)
 
 logging.debug("IP:" + str(param.ip))

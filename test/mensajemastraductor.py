@@ -6,10 +6,10 @@ from src.utils.Traductor import Traductor
 
 def copiar_archivo():
     package = 1
-    mss = 1000
+    mss = 64000
 
-    path_origen = 'meme1.jpg'
-    path_destino = 'copiameme1.jpg'
+    path_origen = 'foto.jpg'
+    path_destino = 'copia_foto.jpg'
 
     with open(path_origen, "rb") as file_origen:
         with open(path_destino, "wb") as file_destino:
@@ -27,9 +27,9 @@ def copiar_archivo():
 
                 mensajeparte = Mensaje(TipoMensaje.PARTE, num_packages, package, bytes_leidos)
                 paqueteparte = Traductor.MensajeAPaquete(mensajeparte)
-                mensaje_retraducido = Traductor.PaqueteAMensaje(paqueteparte)
+                mensaje_retraducido = Traductor.PaqueteAMensaje(paqueteparte, False)
 
-                aux = desfrag.set_bytes_to_file(bytes_leidos, mensaje_retraducido.payload)
+                aux = desfrag.set_bytes_to_file(mensaje_retraducido.payload, package)
                 print(f'Se escribieron {aux} bytes en {path_destino}\n')
                 package = package + 1
 

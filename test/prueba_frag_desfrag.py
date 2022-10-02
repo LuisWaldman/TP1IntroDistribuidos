@@ -7,8 +7,8 @@ def copiar_archivo():
     package = 1
     mss = 100
 
-    path_origen = 'cliente.py'
-    path_destino = 'nuevo_arch.py'
+    path_origen = 'foto.jpg'
+    path_destino = 'copia_foto.jpg'
 
     with open(path_origen, "rb") as file_origen:
         with open(path_destino, "wb") as file_destino:
