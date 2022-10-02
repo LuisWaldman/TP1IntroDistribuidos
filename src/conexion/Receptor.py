@@ -38,6 +38,8 @@ class Receptor:
                     logging.debug("Descartado parte no esperada: ")
                     return
 
+                self.package_esperado += 1
+
                 aux = desfragmentador.set_bytes_to_file(
                     mensaje_recibido.payload,
                     mensaje_recibido.parte
