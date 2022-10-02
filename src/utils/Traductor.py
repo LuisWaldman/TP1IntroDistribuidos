@@ -16,12 +16,15 @@ class Traductor:
             .to_bytes(2, byteorder='big', signed=False)
 
         # Payload MAX 64 KB
-        payload = mensaje.payload.encode('utf-8')
+        if type(mensaje.payload) != type(b'abc123'): # todo corregir esto: el fragmentador devuelve bytes no es necesario encodear en ese caso
+            payload = mensaje.payload.encode('utf-8') if int(mensaje.tamanio_payload) > 0 else None
+        else:
+            payload = mensaje.payload if int(mensaje.tamanio_payload) > 0 else None
 
-        return tipo_msg + total_partes + parte + tamanio_payload + payload
+        return tipo_msg + total_partes + parte + tamanio_payload + payload if int(mensaje.tamanio_payload) > 0 else tipo_msg + total_partes + parte + tamanio_payload
 
     @staticmethod
-    def PaqueteAMensaje(bytes):
+    def PaqueteAMensaje(bytes, convertir_string):
         # Cabecera
         tipo_msg = bytes[0]
         total_partes = bytes[1]
@@ -29,6 +32,9 @@ class Traductor:
         tamanio_payload = bytes[3] * TAMANIO_BYTE + bytes[4]
 
         # Payload MAX 64 KB
-        payload = bytes[5:tamanio_payload+5].decode('utf-8')
+        if convertir_string:
+            payload = bytes[5:tamanio_payload+5].decode('utf-8')
+        else:
+            payload = bytes[5:tamanio_payload + 5]
 
         return Mensaje(tipo_msg, total_partes, parte, payload)

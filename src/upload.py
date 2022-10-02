@@ -2,6 +2,7 @@ import sys
 import math
 from socket import socket, AF_INET, SOCK_DGRAM
 
+from src.conexion.Emisor import Emisor
 from src.utils.salida import Salida
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
@@ -46,27 +47,23 @@ mss = 100
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-Salida.info("Iniciando comunicacion STOP & WAIT")
+Salida.info("Iniciando comunicacion")
 tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD + TipoMensaje.STOPANDWAIT
-primermensaje = Mensaje(tipo_mensaje, 1, 1, "")
+print(f'tipo_mensaje: {tipo_mensaje}')
+primermensaje = Mensaje(tipo_mensaje, 1, 1, param.filename)
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
 clientSocket.sendto(primerpaquete, (param.ip, param.port))
 terminoarhivo = False
 
-with open(param.path + param.filename, "rb") as file_origen:
-    frag = Fragmentador(file_origen, param.mss)
-    parte = 1
-    total_size = frag.get_total_size()
-    num_packages = math.ceil(total_size / param.mss)
-    while parte <= num_packages:
-        bytesleidos = frag.get_bytes_from_file(parte)
-        mensajeparte = Mensaje(TipoMensaje.PARTE, num_packages, parte, bytesleidos)
-        paqueteparte = Traductor.MensajeAPaquete(mensajeparte)
-        clientSocket.sendto(paqueteparte, clientAddress)
-        message, clientAddress = clientSocket.recvfrom(2048)
-        mensaje = Traductor.PaqueteAMensaje(message)
-        if mensajeparte.tipo_mensaje == TipoMensaje.ACK:
-            parte = parte + 1
+Salida.verborragica("esperando respuesta hello ...")
+paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
+Salida.verborragica("paquete recibido")
+mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido, False)
+
+emisor = Emisor(clientSocket, param.path + param.filename, serverAddress)
+emisor.enviar_archivo()
+
+# todo cerrar conexion
 
 clientSocket.close()
 Salida.info("comunicacion terminada")

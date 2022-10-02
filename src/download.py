@@ -1,12 +1,14 @@
 import sys
 from socket import socket, AF_INET, SOCK_DGRAM
 
+from src.conexion.Receptor import Receptor
 from src.utils.salida import Salida
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
 from src.utils.desfragmentador import Desfragmentador
 
+MAX_PAYLOAD = 64000
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -35,35 +37,24 @@ Salida.verborragica("filename:" + str(param.filename))
 
 
 Salida.verborragica("Inicio Parametros")
-mss = 100
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-Salida.info("Iniciando comunicacion STOP & WAIT")
+Salida.info("Iniciando comunicacion")
 tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
 primermensaje = Mensaje(tipo, 1, 1, param.filename)
 primerpaquete = Traductor.MensajeAPaquete(primermensaje)
 clientSocket.sendto(primerpaquete, (param.ip, param.port))
-terminoarhivo = False
 
-desfrag = Desfragmentador(param.filename, mss)
-while not terminoarhivo:
+Salida.verborragica("esperando respuesta hello ...")
+paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
+Salida.verborragica("paquete recibido")
+mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido, False)
 
-    Salida.verborragica("esperando paquete ...")
-    paqueterecibido, serverAddress = clientSocket.recvfrom(2048)
-    Salida.verborragica("paquete recibido")
-    mensajerecibido = Traductor.PaqueteAMensaje(paqueterecibido)
-
-    aux = desfrag.set_bytes_to_file(mensajerecibido.payload,
-                                    mensajerecibido.parte)
-    Salida.verborragica("Bytes Escritos" + aux)
-
-    mensajeAck = Mensaje(TipoMensaje.ACK, 1, 1, mensajerecibido.parte)
-    paqueteack = Traductor.MensajeAPaquete(mensajeAck)
-    Salida.verborragica("Envia ACK parte" + mensajerecibido.parte)
-    clientSocket.sendto(paqueteack, (param.ip, param.port))
-    if mensajerecibido.parte == mensajerecibido.total_partes:
-        terminoarhivo = True
+if(mensajerecibido.tipo_mensaje == TipoMensaje.HOLA):
+    Salida.verborragica("recepción de respuesta hello")
+    receptor = Receptor(clientSocket, param.path + param.filename)
+    receptor.recibir_archivo()
 
 clientSocket.close()
 Salida.info("comunicacion terminada")
