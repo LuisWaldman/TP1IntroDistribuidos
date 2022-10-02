@@ -1,4 +1,5 @@
 import sys
+import signal
 from socket import socket, AF_INET, SOCK_DGRAM
 
 from src.conexion.Receptor import Receptor
@@ -6,7 +7,7 @@ from src.utils.salida import Salida
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
-from src.utils.desfragmentador import Desfragmentador
+from src.utils.signal import sigint_exit
 
 MAX_PAYLOAD = 64000
 
@@ -35,8 +36,7 @@ Salida.verborragica("port:" + str(param.port))
 Salida.verborragica("path:" + str(param.path))
 Salida.verborragica("filename:" + str(param.filename))
 
-
-Salida.verborragica("Inicio Parametros")
+signal.signal(signal.SIGINT, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 

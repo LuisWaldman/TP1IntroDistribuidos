@@ -1,13 +1,13 @@
 import sys
-import math
-from socket import socket, AF_INET, SOCK_DGRAM
+import socket, AF_INET, SOCK_DGRAM
+import signal
 
 from src.conexion.Emisor import Emisor
 from src.utils.salida import Salida
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
-from src.utils.fragmentador import Fragmentador
+from src.utils.signal import sigint_exit
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -40,10 +40,7 @@ Salida.verborragica("port:" + str(param.port))
 Salida.verborragica("path:" + str(param.path))
 Salida.verborragica("filename:" + str(param.filename))
 
-
-Salida.verborragica("Inicio Parametros")
-mss = 100
-
+signal.signal(signal.SIGINT, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 

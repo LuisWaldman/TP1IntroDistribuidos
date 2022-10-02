@@ -1,7 +1,10 @@
 import sys
+import signal
+
 from src.utils.parametros import Parametros
 from src.conexion.Servidor import Servidor
 from src.utils.salida import Salida
+from src.utils.signal import sigint_exit
 
 param = Parametros(sys.argv)
 if param.mostrar_ayuda:
@@ -23,6 +26,7 @@ elif param.error:
 
 Salida.enumsalida = param.enum_salida
 
+signal.signal(signal.SIGINT, sigint_exit)
 
 Salida.verborragica("IP:" + str(param.ip))
 Salida.verborragica("port:" + str(param.port))
