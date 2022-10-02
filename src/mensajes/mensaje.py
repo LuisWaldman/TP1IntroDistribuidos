@@ -38,6 +38,13 @@ class Mensaje:
         if (tipo_msg > 9):
             self.extraer_tipo(tipo_msg)
 
+    def __str__(self):
+        return f"Tipo: {self.tipo_mensaje}" +\
+            f"Tipo operacion: {self.tipo_operacion} " +\
+            f"Tipo protocolo: {self.tipo_protocolo} " +\
+            f"Total partes: {self.total_partes} Parte: {self.parte}" +\
+            f"Tamanio payload: {self.tamanio_payload} Payload: {self.payload}"
+
     def extraer_tipo(self, mensaje):
         mensaje_str = str(mensaje)
         self.tipo_mensaje = int(mensaje_str[-1])

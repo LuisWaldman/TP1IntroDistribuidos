@@ -24,11 +24,12 @@ class Emisor:
 
     def enviar_mensaje(self, frag, num_packages):
         self.lock.acquire()
-        Salida.info(f"Enviamos el paquete {self.package}")
+        Salida.info(f"Enviando paquete numero {self.package}")
         data = frag.get_bytes_from_file(self.package)
         tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD + TipoMensaje.STOPANDWAIT
         msg = Mensaje(tipo, num_packages, self.package, data)
         pkg = Traductor.MensajeAPaquete(msg)
+        Salida.verborragica("Contenido del mensaje: " + str(msg))
         self.socket.sendto(pkg, self.direccion)
         self.package += 1
         self.lock.release()
@@ -53,21 +54,27 @@ class Emisor:
             total_size = frag.get_total_size()
             num_packages = math.ceil(total_size / self.MAX_PAYLOAD)
 
-            Salida.info(f"Arch origen: {total_size}bytes.")
-            Salida.info(f"Se necesita {num_packages} paq de {self.MAX_PAYLOAD} bytes.\n")
+            Salida.info(f"Tamanio archivo: {total_size} bytes.")
+            Salida.info(
+                f"Enviando {num_packages} paquetes de {self.MAX_PAYLOAD} bytes"
+            )
 
             hilos_hijos = list()
             while num_packages >= self.ack_esperado:
                 for i in range(self.N):
                     if self.package <= num_packages:
-                        hilo = threading.Thread(target=self.enviar_mensaje,
-                                                args=(frag, num_packages))
+                        hilo = threading.Thread(
+                            target=self.enviar_mensaje,
+                            args=(frag, num_packages)
+                        )
                         hilos_hijos.append(hilo)
                         hilo.start()
 
+                # TODO: No es una buena idea hacer sleep para sincronizar
                 time.sleep(5)
-                for hilo in hilos_hijos: # todo pensar que si ya uno devuelven bien que envie otro
-                                        # todo tener algun tipo de contador de vacantes para enviar
+                for hilo in hilos_hijos:
+                    # TODO: pensar que si ya uno devuelven bien que envie otro
+                    # TODO: tener algun tipo de contador de vacantes para enviar
                     hilo.join()
                 if self.timeout:
                     Salida.info(f'Timeout paquete {self.ack_esperado}')
