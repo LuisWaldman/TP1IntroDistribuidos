@@ -53,7 +53,7 @@ Salida.verborragica("Paquete HELLO recibido")
 mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
 
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
-    Salida.verborragica("recepción de respuesta hello")
+    Salida.verborragica("Recibiendo archivo...")
     receptor = Receptor(clientSocket, param.path + param.filename)
     receptor.recibir_archivo()
 if mensaje_recibido.tipo == TipoMensaje.ERROR:
