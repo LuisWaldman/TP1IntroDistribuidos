@@ -1,6 +1,7 @@
 import enum
 import hashlib
 
+
 class TipoMensaje(enum.IntEnum):
     NODEFINIDO = 0
     HOLA = 1
@@ -33,7 +34,7 @@ class Mensaje:
         self.total_partes = total_partes
         self.parte = parte
         self.payload = payload
-        self.tamanio_payload = len(payload) if payload != None else 0
+        self.tamanio_payload = len(payload) if payload is not None else 0
         if (tipo_msg > 9):
             self.extraer_tipo(tipo_msg)
         else:

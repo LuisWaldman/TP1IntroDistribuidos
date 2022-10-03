@@ -49,7 +49,10 @@ signal.signal(signal.SIGINT, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-if Conexion.establecer_conexion(clientSocket, (param.ip, param.port), param.filename, TipoMensaje.DOWNLOAD):
+if Conexion.establecer_conexion(clientSocket,
+                                (param.ip, param.port),
+                                param.filename,
+                                TipoMensaje.DOWNLOAD):
     logging.debug("Recibiendo archivo...")
     receptor = Receptor(clientSocket, param.path + param.filename)
     direccion = receptor.recibir_archivo()

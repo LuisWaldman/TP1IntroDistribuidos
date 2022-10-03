@@ -9,6 +9,7 @@ from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.fragmentador import Fragmentador
 from src.utils.Traductor import Traductor
 
+
 class Emisor:
     N = 5
     MAX_PAYLOAD = 64000
@@ -19,7 +20,7 @@ class Emisor:
         self.file_path = file_path
         self.direccion = direccion
         self.socket = socket
-        self.socket.settimeout(2) # segundos
+        self.socket.settimeout(2)  # segundos
         self.lock = threading.Lock()
         self.package = 1
         self.ack_esperado = 1

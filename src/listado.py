@@ -3,7 +3,6 @@ import signal
 import logging
 from socket import socket, AF_INET, SOCK_DGRAM
 
-from src.conexion.Receptor import Receptor
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
@@ -61,7 +60,7 @@ for i in range(0, INTENTOS_CONEXION):
         print(mensaje_recibido.payload)
         break
 
-    except TimeoutError as e:
+    except TimeoutError:
         if i < INTENTOS_CONEXION-1:
             logging.debug("Timeout: reenvio de paquete de listado...")
         else:

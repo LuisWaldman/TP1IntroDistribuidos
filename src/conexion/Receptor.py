@@ -6,6 +6,7 @@ from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.desfragmentador import Desfragmentador
 from src.utils.Traductor import Traductor
 
+
 class Receptor:
     MAX_PAYLOAD = 64000
     MAX_INTENTOS_CHAU = 5
@@ -24,7 +25,7 @@ class Receptor:
 
             while not termino_archivo:
                 logging.debug("Esperando paquete...")
-                paquete_recibido, serverAddress = self.socket.recvfrom(64010) # todo hace cte (? o traer de archivo conf
+                paquete_recibido, serverAddress = self.socket.recvfrom(64010)  # todo hace cte (? o traer de archivo conf
                 logging.debug("Paquete recibido")
                 mensaje_recibido = Traductor.PaqueteAMensaje(
                     paquete_recibido,
@@ -70,7 +71,6 @@ class Receptor:
                 if mensaje_recibido.parte == mensaje_recibido.total_partes:
                     termino_archivo = True
         return serverAddress
-
 
     def reiniciar_transferencia(self, direccion):
         logging.info("Reiniciando tranferencia de archivo")

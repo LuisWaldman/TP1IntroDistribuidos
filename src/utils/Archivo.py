@@ -14,7 +14,6 @@ class Archivo:
     def existe(self):
         return os.path.exists(self.ruta)
 
-
     @staticmethod
     def Archivos(directorio):
         lista = os.listdir(directorio)
@@ -24,5 +23,3 @@ class Archivo:
                 ret = ret + " - "
             ret = ret + par
         return ret
-
-

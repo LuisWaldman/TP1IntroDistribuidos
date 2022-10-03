@@ -6,6 +6,7 @@ from src.utils.Traductor import Traductor
 INTENTOS_CONEXION = 5
 TIMEOUT_SEGUNDOS = 2
 
+
 def establecer_conexion(socket, address, filename, tipo_mensaje):
     logging.debug("Estableciendo conexión...")
 
@@ -32,6 +33,7 @@ def establecer_conexion(socket, address, filename, tipo_mensaje):
                 return (False, None)
     return (True, serverAddres)
 
+
 def responder_conexion(socket, address, tipo_mensaje):
     for i in range(0, INTENTOS_CONEXION):
         enviar_hello_response(socket, address, tipo_mensaje)
@@ -54,6 +56,8 @@ def responder_conexion(socket, address, tipo_mensaje):
                 logging.info("No se pudo establecer la conexion")
                 return False
     return True
+
+
 def enviar_hello(socket, address, filename, tipo_mensaje):
     logging.debug("Enviando paquete HELLO...")
     tipo = TipoMensaje.HOLA + tipo_mensaje
@@ -61,12 +65,14 @@ def enviar_hello(socket, address, filename, tipo_mensaje):
     pkg = Traductor.MensajeAPaquete(msg)
     socket.sendto(pkg, address)
 
+
 def enviar_hello_response(socket, address, tipo_mensaje):
     logging.debug("Enviando paquete HELLO RESPONSE...")
     tipo = TipoMensaje.HOLA + tipo_mensaje
     msg = Mensaje(tipo, 1, 1, None)
     pkg = Traductor.MensajeAPaquete(msg)
     socket.sendto(pkg, address)
+
 
 def enviar_hello_ack(socket, address):
     logging.debug("Enviando paquete HELLO ACK...")

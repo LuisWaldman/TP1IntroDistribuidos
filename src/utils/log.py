@@ -1,5 +1,6 @@
 from logging import getLogger, getLevelName, Formatter, StreamHandler
 
+
 def set_up_log(level):
     log = getLogger()
     log.setLevel(getLevelName(level))

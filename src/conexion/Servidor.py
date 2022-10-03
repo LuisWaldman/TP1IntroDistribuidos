@@ -13,6 +13,7 @@ from src.conexion.Emisor import Emisor
 
 ESPERA_CONEXION = 5
 
+
 class Servidor:
     BUFER_MAXIMO = 1024
     hilo_ppal = ''
@@ -43,7 +44,7 @@ class Servidor:
             except TimeoutError:
                 continue
 
-            logging.info("Mensaje recibido. Abriendo hilo para el nuevo cliente")
+            logging.info("Mensaje recibido. Nuevo hilo para el cliente")
             hilo = threading.Thread(target=self.atender_cliente,
                                     args=(mensaje, direccion))
             self.clientes_hilos.append(hilo)
@@ -114,7 +115,9 @@ class Servidor:
         socket_atencion = socket(AF_INET, SOCK_DGRAM)
         try:
             self.assert_message(mensaje, direccion)
-            if Conexion.responder_conexion(socket_atencion, direccion, mensaje.tipo_operacion):
+            if Conexion.responder_conexion(socket_atencion,
+                                           direccion,
+                                           mensaje.tipo_operacion):
                 if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                     logging.info("Atendiendo: cliente=receptor servidor=emisor")
                     emisor = Emisor(
@@ -134,7 +137,7 @@ class Servidor:
         except Exception as error:
             self.enviar_error(socket_atencion, str(error), direccion)
         socket_atencion.close()
-    
+
     def enviar_error(self, socket, error, direccion):
         logging.info("Enviando mensaje de error")
         error_msg = Mensaje(TipoMensaje.ERROR, 1, 1, error)
