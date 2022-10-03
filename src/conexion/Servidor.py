@@ -11,8 +11,6 @@ from src.utils.Archivo import Archivo
 
 from src.conexion.Emisor import Emisor
 
-TIMEOUT_SEGUNDOS = 2
-INTENTOS_CONEXION = 5
 ESPERA_CONEXION = 5
 
 class Servidor:
@@ -53,49 +51,59 @@ class Servidor:
 
         self.detener_hilos_clientes()
 
+    def assert_nuevo_cliente(self, direccion):
+        if direccion in self.clientes:
+            error = "Conexión existente. Desacarto mensaje"
+            logging.info(error)
+            self.lock.release()
+            raise Exception(error)
+
+    def assert_archivo(self, mensaje, existe):
+        if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
+            logging.info("Conexión de tipo DOWNLOAD")
+            if not existe:
+                error = "El archivo solicitado no existe"
+                logging.info(error)
+                self.lock.release()
+                raise Exception(error)
+            logging.info("Archivo solicitado existente")
+        elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
+            logging.info("Conexión de tipo UPLOAD")
+            if existe:
+                error = "El archivo ofrecido existente"
+                logging.info(error)
+                self.lock.release()
+                raise Exception(error)
+            logging.info("Archivo ofrecido inexistente")
+
+    def obtener_listado(self, direccion):
+        logging.info("Respondiendo mensaje de obtener listado")
+        tipo = TipoMensaje.PARTE
+        misarchivos = Archivo.Archivos(self.dirpath)
+        mensajelistado = Mensaje(tipo, 1, 1, misarchivos)
+
+        listado_pkg = Traductor.MensajeAPaquete(mensajelistado)
+        socket_listado = socket(AF_INET, SOCK_DGRAM)
+        socket_listado.sendto(listado_pkg, direccion)
+        socket_listado.close()
 
     def assert_message(self, mensaje, direccion):
         error = ""
         if mensaje.tipo_mensaje == TipoMensaje.HOLA:
             logging.info("Mensaje recibido para iniciar conexión")
+
             self.lock.acquire()
-            if direccion in self.clientes:
-                error = "Conexión existente. Desacarto mensaje"
-                logging.info(error)
-                self.lock.release()
-                raise Exception(error)
+            self.assert_nuevo_cliente(direccion)
+
             archivo = Archivo(self.dirpath + mensaje.payload)
-            existe = archivo.existe()
-            if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
-                logging.info("Conexión de tipo DOWNLOAD")
-                if not existe:
-                    error = "El archivo solicitado no existe"
-                    logging.info(error)
-                    self.lock.release()
-                    raise Exception(error)
-                logging.info("Archivo solicitado existente")
-            elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
-                logging.info("Conexión de tipo UPLOAD")
-                if existe:
-                    error = "El archivo ofrecido existente"
-                    logging.info(error)
-                    self.lock.release()
-                    raise Exception(error)
-                logging.info("Archivo ofrecido inexistente")
+            self.assert_archivo(mensaje, archivo.existe())
+
             self.clientes.append(direccion)
             self.lock.release()
             logging.info("Nuevo cliente agregado al servidor")
 
         elif mensaje.tipo_mensaje == TipoMensaje.OBTENERLISTADO:
-            logging.info("Respondiendo mensaje de obtener listado")
-            tipo = TipoMensaje.PARTE
-            misarchivos = Archivo.Archivos(self.dirpath)
-            mensajelistado = Mensaje(tipo, 1, 1, misarchivos)
-
-            listado_pkg = Traductor.MensajeAPaquete(mensajelistado)
-            socket_listado = socket(AF_INET, SOCK_DGRAM)
-            socket_listado.sendto(listado_pkg, direccion)
-            socket_listado.close()
+            self.obtener_listado(direccion)
         else:
             error = "Primer mensaje enviado por un cliente no fue HELLO"
             logging.info(error)
@@ -103,11 +111,9 @@ class Servidor:
 
     def atender_cliente(self, paquete, direccion):
         mensaje = Traductor.PaqueteAMensaje(paquete, True)
-
         socket_atencion = socket(AF_INET, SOCK_DGRAM)
         try:
             self.assert_message(mensaje, direccion)
-
             if Conexion.responder_conexion(socket_atencion, direccion, mensaje.tipo_operacion):
                 if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                     logging.info("Atendiendo: cliente=receptor servidor=emisor")
