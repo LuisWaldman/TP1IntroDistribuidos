@@ -12,6 +12,7 @@ class Parametros:
     port = 10666
     path = "."
     filename = ""
+    protocoloN = 5
     error = False
 
     def __init__(self, parametros):
@@ -26,11 +27,13 @@ class Parametros:
             elif par == "-q":
                 self.enum_salida = "WARN"
                 cargando = ""
-            elif par in ('-H', '-p', '-s', '-d', '-n'):
+            elif par in ('-H', '-p', '-s', '-d', '-n', '-pr'):
                 cargando = par
             else:
                 if cargando == "-H":
                     self.ip = par
+                elif cargando == "-pr":
+                    self.protocoloN = int(par)
                 elif cargando == "-p":
                     self.port = int(par)
                 elif cargando == "-s" or cargando == "-d":

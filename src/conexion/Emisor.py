@@ -15,7 +15,7 @@ class Emisor:
     MAX_REENVIOS_SEGUIDOS = 30
     MAX_INTENTOS_CHAU = 5
 
-    def __init__(self, socket, file_path, direccion):
+    def __init__(self, socket, file_path, direccion, protocolo_N):
         self.file_path = file_path
         self.direccion = direccion
         self.socket = socket
@@ -25,6 +25,7 @@ class Emisor:
         self.ack_esperado = 1
         self.reenvios_seguidos = 0
         self.reinicio = False
+        self.N = protocolo_N
 
     def enviar_mensajes(self, frag, num_packages):
         while self.package <= num_packages and self.ack_esperado <= num_packages:
