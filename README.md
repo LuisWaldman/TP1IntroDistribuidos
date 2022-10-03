@@ -43,3 +43,14 @@ Correr tox:
 ```bash
 tox
 ```
+
+## Comcast
+
+Descargar e instalar [GO](https://go.dev/doc/install) e instalar
+[comcast](https://github.com/tylertreat/comcast#installation).
+
+```bash
+PATH="$HOME/go/bin/:/usr/local/go/bin:$PATH"
+comcast --device=lo0 --packet-loss=10%
+comcast --stop
+```
