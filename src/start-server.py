@@ -33,6 +33,14 @@ logging.debug("port:" + str(param.port))
 logging.debug("path:" + str(param.path))
 logging.debug("filename:" + str(param.filename))
 
+
+logging.info('Iniciando servidor')
 servidor = Servidor(param.ip, param.port, param.path)
-logging.info('Servidor iniciado')
-servidor.escuchar()
+server_hilo = servidor.iniciar()
+while servidor.activo:
+    try:
+        logging.info('Ingrese q para cerrar el servidor')
+        if input().lower() == 'q':
+            servidor.detener()
+    except KeyboardInterrupt:
+        servidor.detener()
