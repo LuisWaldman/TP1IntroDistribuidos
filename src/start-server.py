@@ -35,7 +35,7 @@ logging.debug("filename:" + str(param.filename))
 
 
 logging.info('Iniciando servidor')
-servidor = Servidor(param.ip, param.port, param.path)
+servidor = Servidor(param.ip, param.port, param.path, param.protocoloN)
 server_hilo = servidor.iniciar()
 while servidor.activo:
     try:

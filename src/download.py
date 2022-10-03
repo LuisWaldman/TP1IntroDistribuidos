@@ -55,7 +55,7 @@ clientSocket = socket(AF_INET, SOCK_DGRAM)
 
 logging.info("Iniciando comunicación")
 tipo = TipoMensaje.HOLA + TipoMensaje.DOWNLOAD
-primer_mensaje = Mensaje(tipo, 1, 1, param.filename + "," + str(param.protocoloN))
+primer_mensaje = Mensaje(tipo, 1, 1, param.filename)
 primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)
 
 for i in range(0, INTENTOS_CONEXION):
