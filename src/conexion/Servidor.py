@@ -16,8 +16,9 @@ ESPERA_CONEXION = 5
 class Servidor:
     BUFER_MAXIMO = 1024
     hilo_ppal = ''
+    N = 5
 
-    def __init__(self, ip, puerto, dirpath):
+    def __init__(self, ip, puerto, dirpath, protocolo_N):
         self.conexion = socket(AF_INET, SOCK_DGRAM)
         self.conexion.bind((ip, puerto))
         self.dirpath = dirpath
@@ -25,6 +26,7 @@ class Servidor:
         self.lock = threading.Lock()
         self.activo = False
         self.clientes_hilos = list()
+        self.N = protocolo_N
 
     def iniciar(self):
         self.hilo_ppal = threading.Thread(target=self.escuchar)
@@ -59,10 +61,10 @@ class Servidor:
                 logging.info(error)
                 self.lock.release()
                 raise Exception(error)
+            archivo = Archivo(self.dirpath + mensaje.payload)
+            existe = archivo.existe()
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 logging.info("Conexión de tipo DOWNLOAD")
-                archivo = Archivo(self.dirpath + mensaje.payload.split(",")[0])
-                existe = archivo.existe()
                 if not existe:
                     error = "El archivo solicitado no existe"
                     logging.info(error)
@@ -71,8 +73,6 @@ class Servidor:
                 logging.info("Archivo solicitado existente")
             elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
                 logging.info("Conexión de tipo UPLOAD")
-                archivo = Archivo(self.dirpath + mensaje.payload)
-                existe = archivo.existe()
                 if existe:
                     error = "El archivo ofrecido existente"
                     logging.info(error)
@@ -108,7 +108,7 @@ class Servidor:
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 logging.info("Atendiendo: cliente=receptor servidor=emisor")
                 emisor = Emisor(
-                    socket_atencion, self.dirpath + mensaje.payload.split(",")[0], direccion, int(mensaje.payload.split(",")[1])
+                    socket_atencion, self.dirpath + mensaje.payload, direccion, self.N
                 )
                 emisor.enviar_archivo()
                 emisor.cerrar_conexion()
