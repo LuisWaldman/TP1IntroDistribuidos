@@ -41,18 +41,18 @@ class Receptor:
                     self.reiniciar_transferencia(serverAddress)
                     continue
 
-                if not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte == self.package_esperado):
+                if not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte <= self.package_esperado):
                     logging.debug("Descartado parte no esperada")
                     continue
 
-                #if mensaje_recibido.parte == self.package_esperado:
-                self.package_esperado += 1
+                if mensaje_recibido.parte == self.package_esperado:
+                    self.package_esperado += 1
 
-                aux = desfragmentador.set_bytes_to_file(
-                    mensaje_recibido.payload,
-                    mensaje_recibido.parte
-                )
-                logging.debug(f"Bytes Escritos: {aux}")
+                    aux = desfragmentador.set_bytes_to_file(
+                        mensaje_recibido.payload,
+                        mensaje_recibido.parte
+                    )
+                    logging.debug(f"Bytes Escritos: {aux}")
 
                 tipo = TipoMensaje.ACK +\
                     mensaje_recibido.tipo_operacion
