@@ -11,9 +11,11 @@ from src.conexion.Emisor import Emisor
 
 TIMEOUT_SEGUNDOS = 2
 INTENTOS_CONEXION = 5
+ESPERA_CONEXION = 5
 
 class Servidor:
     BUFER_MAXIMO = 1024
+    hilo_ppal = ''
 
     def __init__(self, ip, puerto, dirpath):
         self.conexion = socket(AF_INET, SOCK_DGRAM)
@@ -21,17 +23,31 @@ class Servidor:
         self.dirpath = dirpath
         self.clientes = list()
         self.lock = threading.Lock()
+        self.activo = False
+        self.clientes_hilos = list()
+
+    def iniciar(self):
+        self.hilo_ppal = threading.Thread(target=self.escuchar)
+        logging.info('Servidor iniciado')
+        self.hilo_ppal.start()
 
     def escuchar(self):
+        self.activo = True
         logging.info("Escuchando ...")
-        while True:
-            mensaje, direccion = self.conexion.recvfrom(self.BUFER_MAXIMO)
+        while self.activo:
+            try:
+                self.conexion.settimeout(ESPERA_CONEXION)
+                mensaje, direccion = self.conexion.recvfrom(self.BUFER_MAXIMO)
+            except TimeoutError:
+                continue
 
             logging.info("Mensaje recibido. Abriendo hilo para el nuevo cliente")
-
             hilo = threading.Thread(target=self.atender_cliente,
                                     args=(mensaje, direccion))
+            self.clientes_hilos.append(hilo)
             hilo.start()
+
+        self.detener_hilos_clientes()
 
     def assert_message(self, mensaje, direccion):
         error = ""
@@ -132,11 +148,20 @@ class Servidor:
                     logging.info("No se pudo establecer la conexion")
                     socket.close()
 
-
-
     
     def enviar_error(self, socket, error, direccion):
         logging.info("Enviando mensaje de error")
-        hello_response_msg = Mensaje(TipoMensaje.ERROR, 1, 1, error)
-        hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
-        socket.sendto(hello_response_pkg, direccion)
+        error_msg = Mensaje(TipoMensaje.ERROR, 1, 1, error)
+        error_pkg = Traductor.MensajeAPaquete(error_msg)
+        socket.sendto(error_pkg, direccion)
+
+    def detener_hilos_clientes(self):
+        for cliente_hilo in self.clientes_hilos:
+            cliente_hilo.join()
+        self.conexion.close()
+
+    def detener(self):
+        logging.info("Cerrando servidor")
+        self.activo = False
+        self.hilo_ppal.join()
+        logging.info("Servidor cerrado")
