@@ -34,8 +34,8 @@ class Emisor:
             self.lock.release()
 
             # todo corregir esto
-            #if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
-            #    break
+            if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+                break
 
             logging.debug(f"Enviando paquete numero {package_aux}")
             data = frag.get_bytes_from_file(package_aux)
@@ -97,9 +97,9 @@ class Emisor:
                 self.reiniciar_transferencia(self.direccion)
 
             # todo corregir
-            #if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
-            #    logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
-            #    return
+            if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+                logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
+                return
 
             logging.info('archivo enviado exitosamente')
 

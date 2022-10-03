@@ -121,6 +121,7 @@ class Servidor:
                 receptor.esperar_cierre_conexion(direccion_a_cerrar)
         except Exception as error:
             self.enviar_error(socket_atencion, str(error), direccion)
+        socket_atencion.close()
 
     def responder(self, socket, direccion, tipo_operacion):
         for i in range(0, INTENTOS_CONEXION):
@@ -146,7 +147,6 @@ class Servidor:
                     logging.debug("Timeout: reenvio de paquete HELLO RESPONSE...")
                 else:
                     logging.info("No se pudo establecer la conexion")
-                    socket.close()
 
     
     def enviar_error(self, socket, error, direccion):
