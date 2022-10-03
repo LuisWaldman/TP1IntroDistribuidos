@@ -36,9 +36,10 @@ class Receptor:
                     return
 
                 if not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte == self.package_esperado):
-                    logging.debug("Descartado parte no esperada: ")
-                    return
+                    logging.debug("Descartado parte no esperada")
+                    continue
 
+                #if mensaje_recibido.parte == self.package_esperado:
                 self.package_esperado += 1
 
                 aux = desfragmentador.set_bytes_to_file(

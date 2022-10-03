@@ -8,9 +8,9 @@ from src.utils.fragmentador import Fragmentador
 from src.utils.Traductor import Traductor
 
 class Emisor:
-    N = 3
+    N = 5
     MAX_PAYLOAD = 64000
-    MAX_REENVIOS_SEGUIDOS = 20
+    MAX_REENVIOS_SEGUIDOS = 30
     MAX_INTENTOS_CHAU = 5
 
     def __init__(self, socket, file_path, direccion):
@@ -21,50 +21,44 @@ class Emisor:
         self.lock = threading.Lock()
         self.package = 1
         self.ack_esperado = 1
-        self.timeout = False
         self.reenvios_seguidos = 0
-        self.en_vuelo = 0
 
-
-    def enviar_mensaje(self, frag, num_packages):
-        self.lock.acquire()
-        if self.en_vuelo < self.N and self.package <= num_packages:
-            logging.debug(f"Enviando paquete numero {self.package}")
-            data = frag.get_bytes_from_file(self.package)
-            tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD
-            logging.debug(f'package {self.package} data size: {len(data)}')
-            msg = Mensaje(tipo, num_packages, self.package, data)
-            pkg = Traductor.MensajeAPaquete(msg)
-            # logging.debug("Contenido del mensaje: " + str(msg))
-            self.socket.sendto(pkg, self.direccion)
-            self.en_vuelo += 1
-            self.package += 1
-        else:
-            self.lock.release()
-            return
-
-        self.lock.release()
-
-        try:
-            message, clientAddress = self.socket.recvfrom(2048)
-        except timeout:
+    def enviar_mensajes(self, frag, num_packages):
+        while self.package <= num_packages and self.ack_esperado <= num_packages:
             self.lock.acquire()
-            logging.debug(f'Timeout paquete {self.ack_esperado}')
-            self.package = self.ack_esperado
-            self.en_vuelo = 0
-            self.reenvios_seguidos += 1
+            package_aux = self.package
+            self.package += 1
             self.lock.release()
-            return
 
-        self.lock.acquire()
-        mensaje = Traductor.PaqueteAMensaje(message, False)
-        if mensaje.tipo_mensaje == TipoMensaje.ACK and self.ack_esperado == mensaje.parte:
-            logging.debug(f"Recibi el ack del paquete {mensaje.parte}")
-            self.ack_esperado += 1
-            self.en_vuelo -= 1
-            self.reenvios_seguidos = 0
-        self.lock.release()
+            if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+                break
 
+            logging.debug(f"Enviando paquete numero {package_aux}")
+            data = frag.get_bytes_from_file(package_aux)
+            tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD
+            logging.debug(f'package {package_aux} data size: {len(data)}')
+            msg = Mensaje(tipo, num_packages, package_aux, data)
+            pkg = Traductor.MensajeAPaquete(msg)
+            self.socket.sendto(pkg, self.direccion)
+
+            try:
+                message, clientAddress = self.socket.recvfrom(2048)
+            except timeout:
+                logging.debug(f'Timeout paquete {self.ack_esperado}')
+                if package_aux >= self.ack_esperado:
+                    self.lock.acquire()
+                    self.package = self.ack_esperado
+                    self.reenvios_seguidos += 1
+                    self.lock.release()
+                continue
+
+            mensaje = Traductor.PaqueteAMensaje(message, False)
+            if mensaje.tipo_mensaje == TipoMensaje.ACK and mensaje.parte >= self.ack_esperado:
+                logging.debug(f"Recibi el ack del paquete {mensaje.parte}")
+                self.lock.acquire()
+                self.ack_esperado = mensaje.parte + 1
+                self.reenvios_seguidos = 0
+                self.lock.release()
 
     def enviar_archivo(self):
         with open(self.file_path, "rb") as file_origen:
@@ -78,23 +72,23 @@ class Emisor:
             )
 
             hilos_hijos = list()
-            while num_packages >= self.ack_esperado:
-                if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
-                    logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
-                    for hilo in hilos_hijos:
-                        hilo.join()
-                    return
+            for i in range(self.N):
+                hilo = threading.Thread(
+                    target=self.enviar_mensajes,
+                    args=(frag, num_packages)
+                )
+                hilos_hijos.append(hilo)
+                hilo.start()
 
-                #logging.debug(f'Paquetes en vuelo: {self.en_vuelo} | Prox. paquete a enviar: {self.package} | Total de paquetes: {num_packages}')
-                elif self.en_vuelo < self.N and self.package <= num_packages:
-                    hilo = threading.Thread(
-                        target=self.enviar_mensaje,
-                        args=(frag, num_packages)
-                    )
-                    hilos_hijos.append(hilo)
-                    hilo.start()
+            for hilo in hilos_hijos:
+                hilo.join()
+
+            if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+                logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
+                return
 
             logging.info('archivo enviado exitosamente')
+
 
     def cerrar_conexion(self):
         logging.info("Enviando mensaje CHAU...")
