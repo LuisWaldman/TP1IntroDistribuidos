@@ -17,6 +17,10 @@ INTENTOS_CONEXION = 5
 exit_code = 0
 
 param = Parametros(sys.argv)
+if param.filename == "":
+    print('ERROR: Debe especificar un archivo')
+    param.error = True
+
 if param.mostrar_ayuda:
     print("usage : download [ - h ] [ - v | -q ] [ - H ADDR ] "
           "[ - p PORT ] [ - d FILEPATH ] [ - n FILENAME ]")

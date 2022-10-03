@@ -39,14 +39,9 @@ class Parametros:
                     self.filename = par
 
         self.validateIp()
-        self.validateFile()
         self.validatePort()
         self.validatePath()
 
-    def validateFile(self):
-        if self.filename == "":
-            print('ERROR: Debe especificar un archivo')
-            self.error = True
     def validateIp(self):
         if self.ip == 'localhost':
             return
