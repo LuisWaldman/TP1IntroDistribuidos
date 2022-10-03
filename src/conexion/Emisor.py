@@ -3,6 +3,8 @@ import logging
 import threading
 
 from _socket import timeout
+
+from src.conexion import Conexion
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.fragmentador import Fragmentador
 from src.utils.Traductor import Traductor
@@ -22,6 +24,7 @@ class Emisor:
         self.package = 1
         self.ack_esperado = 1
         self.reenvios_seguidos = 0
+        self.reinicio = False
 
     def enviar_mensajes(self, frag, num_packages):
         while self.package <= num_packages and self.ack_esperado <= num_packages:
@@ -42,9 +45,12 @@ class Emisor:
             self.socket.sendto(pkg, self.direccion)
 
             try:
-                message, clientAddress = self.socket.recvfrom(2048)
+                message, direccion = self.socket.recvfrom(2048)
             except timeout:
                 logging.debug(f'Timeout paquete {self.ack_esperado}')
+                if self.reinicio:
+                    break
+
                 if package_aux >= self.ack_esperado:
                     self.lock.acquire()
                     self.package = self.ack_esperado
@@ -59,6 +65,9 @@ class Emisor:
                 self.ack_esperado = mensaje.parte + 1
                 self.reenvios_seguidos = 0
                 self.lock.release()
+            elif mensaje.tipo_mensaje == TipoMensaje.HOLA:
+                self.reinicio = True
+                break
 
     def enviar_archivo(self):
         with open(self.file_path, "rb") as file_origen:
@@ -83,12 +92,22 @@ class Emisor:
             for hilo in hilos_hijos:
                 hilo.join()
 
+            if self.reinicio:
+                self.reiniciar_transferencia(self.direccion)
+
             if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
                 logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
                 return
 
             logging.info('archivo enviado exitosamente')
 
+    def reiniciar_transferencia(self, direccion):
+        logging.info("Reiniciando tranferencia de archivo")
+        self.package = 1
+        self.ack_esperado = 1
+        self.reenvios_seguidos = 0
+        self.reinicio = False
+        Conexion.hello_ack(self.socket, direccion)
 
     def cerrar_conexion(self):
         logging.info("Enviando mensaje CHAU...")

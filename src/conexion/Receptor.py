@@ -1,6 +1,7 @@
 import logging
 from _socket import timeout
 
+from src.conexion import Conexion
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.desfragmentador import Desfragmentador
 from src.utils.Traductor import Traductor
@@ -35,6 +36,11 @@ class Receptor:
                     logging.info("Error descargando parte: " + str(mensaje_recibido.parte))
                     return
 
+                if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
+                    logging.info("Mensaje HELLO RESPONSE recibido")
+                    self.reiniciar_transferencia(serverAddress)
+                    continue
+
                 if not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte == self.package_esperado):
                     logging.debug("Descartado parte no esperada")
                     continue
@@ -63,6 +69,12 @@ class Receptor:
                 if mensaje_recibido.parte == mensaje_recibido.total_partes:
                     termino_archivo = True
         return serverAddress
+
+
+    def reiniciar_transferencia(self, direccion):
+        logging.info("Reiniciando tranferencia de archivo")
+        self.package_esperado = 1
+        Conexion.hello_ack(self.socket, direccion)
 
     def esperar_cierre_conexion(self, direccion):
         closed = False
