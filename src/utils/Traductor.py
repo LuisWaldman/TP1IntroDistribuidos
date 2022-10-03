@@ -1,6 +1,8 @@
-from src.mensajes.mensaje import Mensaje
+from src.mensajes.mensaje import Mensaje, TipoMensaje
+
 
 TAMANIO_BYTE = 256
+SUM_CHECKSUM = 65535
 
 
 class Traductor:
@@ -14,6 +16,8 @@ class Traductor:
             .to_bytes(1, byteorder='big', signed=False)
         tamanio_payload = int(mensaje.tamanio_payload) \
             .to_bytes(2, byteorder='big', signed=False)
+        checksum = int(mensaje.checksum_complemento) \
+            .to_bytes(2, byteorder='big', signed=False)
 
         # Payload MAX 64 KB
         if type(mensaje.payload) != type(b'abc123'): # todo corregir esto: el fragmentador devuelve bytes no es necesario encodear en ese caso
@@ -21,7 +25,8 @@ class Traductor:
         else:
             payload = mensaje.payload if int(mensaje.tamanio_payload) > 0 else None
 
-        return tipo_msg + total_partes + parte + tamanio_payload + payload if int(mensaje.tamanio_payload) > 0 else tipo_msg + total_partes + parte + tamanio_payload
+        return tipo_msg + total_partes + parte + tamanio_payload + checksum + payload if int(mensaje.tamanio_payload) > 0 \
+            else tipo_msg + total_partes + parte + tamanio_payload + checksum
 
     @staticmethod
     def PaqueteAMensaje(bytes, convertir_string):
@@ -30,11 +35,15 @@ class Traductor:
         total_partes = bytes[1]
         parte = bytes[2]
         tamanio_payload = bytes[3] * TAMANIO_BYTE + bytes[4]
+        checksum = bytes[5] * TAMANIO_BYTE + bytes[6]
 
         # Payload MAX 64 KB
         if convertir_string:
-            payload = bytes[5:tamanio_payload+5].decode('utf-8')
+            payload = bytes[7:tamanio_payload + 7].decode('utf-8')
         else:
-            payload = bytes[5:tamanio_payload + 5]
+            payload = bytes[7:tamanio_payload + 7]
 
-        return Mensaje(tipo_msg, total_partes, parte, payload)
+        mensaje = Mensaje(tipo_msg, total_partes, parte, payload)
+        if checksum + mensaje.checksum != SUM_CHECKSUM:
+            return Mensaje(TipoMensaje.ERROR, total_partes, parte, "Checksum difiere")
+        return mensaje
