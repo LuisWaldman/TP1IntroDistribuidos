@@ -9,6 +9,7 @@ class TipoMensaje(enum.IntEnum):
     ACK = 4
     ERROR = 5
     OBTENERLISTADO = 6
+    HOLA_ACK = 7
 
     # Operacion
     DOWNLOAD = 10

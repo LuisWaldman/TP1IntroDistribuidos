@@ -9,6 +9,8 @@ from src.utils.Archivo import Archivo
 
 from src.conexion.Emisor import Emisor
 
+TIMEOUT_SEGUNDOS = 2
+INTENTOS_CONEXION = 5
 
 class Servidor:
     BUFER_MAXIMO = 1024
@@ -105,11 +107,33 @@ class Servidor:
             self.enviar_error(socket_atencion, str(error), direccion)
 
     def responder(self, socket, direccion, tipo_operacion):
-        logging.info("Respondiendo mensaje hello")
-        tipo = TipoMensaje.HOLA + tipo_operacion
-        hello_response_msg = Mensaje(tipo, 1, 1, None)
-        hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
-        socket.sendto(hello_response_pkg, direccion)
+        for i in range(0, INTENTOS_CONEXION):
+            try:
+                logging.info("Respondiendo mensaje hello")
+                tipo = TipoMensaje.HOLA + tipo_operacion
+                hello_response_msg = Mensaje(tipo, 1, 1, None)
+                hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
+                socket.sendto(hello_response_pkg, direccion)
+
+                logging.debug("Esperando paquete HELLO ACK...")
+                socket.settimeout(TIMEOUT_SEGUNDOS)
+
+                paquete_recibido, serverAddress = socket.recvfrom(2048)
+                mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
+
+                if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA_ACK:
+                    logging.debug("Paquete HELLO ACK recibido")
+                    break
+
+            except TimeoutError as e:
+                if i < INTENTOS_CONEXION - 1:
+                    logging.debug("Timeout: reenvio de paquete HELLO RESPONSE...")
+                else:
+                    logging.info("No se pudo establecer la conexion")
+                    socket.close()
+
+
+
     
     def enviar_error(self, socket, error, direccion):
         logging.info("Enviando mensaje de error")

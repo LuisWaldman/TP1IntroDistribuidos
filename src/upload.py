@@ -3,6 +3,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 import signal
 import logging
 
+from src.conexion import Conexion
 from src.conexion.Emisor import Emisor
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
@@ -75,6 +76,7 @@ for i in range(0, INTENTOS_CONEXION):
             exit(5)
 
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
+    Conexion.hello_ack(clientSocket, serverAddress)
     logging.debug("Enviando archivo...")
     emisor = Emisor(clientSocket, param.path + param.filename, serverAddress)
     emisor.enviar_archivo()

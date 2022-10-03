@@ -3,6 +3,7 @@ import signal
 import logging
 from socket import socket, AF_INET, SOCK_DGRAM
 
+from src.conexion import Conexion
 from src.conexion.Receptor import Receptor
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje, Mensaje
@@ -60,7 +61,7 @@ for i in range(0, INTENTOS_CONEXION):
         clientSocket.settimeout(TIMEOUT_SEGUNDOS)
 
         paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
-        logging.debug("Paquete HELLO recibido")
+        logging.debug("Paquete HELLO RESPONSE recibido")
         mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
         break
 
@@ -73,6 +74,7 @@ for i in range(0, INTENTOS_CONEXION):
             exit(5)
 
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
+    Conexion.hello_ack(clientSocket, serverAddress)
     logging.debug("Recibiendo archivo...")
     clientSocket.settimeout(None)
     receptor = Receptor(clientSocket, param.path + param.filename)
