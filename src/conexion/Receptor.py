@@ -75,7 +75,7 @@ class Receptor:
     def reiniciar_transferencia(self, direccion):
         logging.info("Reiniciando tranferencia de archivo")
         self.package_esperado = 1
-        Conexion.hello_ack(self.socket, direccion)
+        Conexion.enviar_hello_ack(self.socket, direccion)
 
     def esperar_cierre_conexion(self, direccion):
         closed = False

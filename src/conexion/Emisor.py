@@ -110,7 +110,7 @@ class Emisor:
         self.ack_esperado = 1
         self.reenvios_seguidos = 0
         self.reinicio = False
-        Conexion.hello_ack(self.socket, direccion)
+        Conexion.enviar_hello_ack(self.socket, direccion)
 
     def cerrar_conexion(self):
         logging.info("Enviando mensaje CHAU...")

@@ -2,6 +2,8 @@ import threading
 import logging
 
 from socket import socket, AF_INET, SOCK_DGRAM
+
+from src.conexion import Conexion
 from src.conexion.Receptor import Receptor
 from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.Traductor import Traductor
@@ -50,6 +52,7 @@ class Servidor:
             hilo.start()
 
         self.detener_hilos_clientes()
+
 
     def assert_message(self, mensaje, direccion):
         error = ""
@@ -104,52 +107,27 @@ class Servidor:
         socket_atencion = socket(AF_INET, SOCK_DGRAM)
         try:
             self.assert_message(mensaje, direccion)
-            self.responder(socket_atencion, direccion, mensaje.tipo_operacion)
-            if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
-                logging.info("Atendiendo: cliente=receptor servidor=emisor")
-                emisor = Emisor(
-                    socket_atencion, self.dirpath + mensaje.payload, direccion, self.N
-                )
-                emisor.enviar_archivo()
-                emisor.cerrar_conexion()
-            elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
-                logging.info("Atendiendo: cliente=emisor servidor=receptor")
-                receptor = Receptor(
-                    socket_atencion, self.dirpath + mensaje.payload
-                )
-                direccion_a_cerrar = receptor.recibir_archivo()
-                if not direccion_a_cerrar == direccion:
-                    logging.info(f"{direccion_a_cerrar} != {direccion}")
-                receptor.esperar_cierre_conexion(direccion_a_cerrar)
+
+            if Conexion.responder_conexion(socket_atencion, direccion, mensaje.tipo_operacion):
+                if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
+                    logging.info("Atendiendo: cliente=receptor servidor=emisor")
+                    emisor = Emisor(
+                        socket_atencion, self.dirpath + mensaje.payload, direccion, self.N
+                    )
+                    emisor.enviar_archivo()
+                    emisor.cerrar_conexion()
+                elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
+                    logging.info("Atendiendo: cliente=emisor servidor=receptor")
+                    receptor = Receptor(
+                        socket_atencion, self.dirpath + mensaje.payload
+                    )
+                    direccion_a_cerrar = receptor.recibir_archivo()
+                    if not direccion_a_cerrar == direccion:
+                        logging.info(f"{direccion_a_cerrar} != {direccion}")
+                    receptor.esperar_cierre_conexion(direccion_a_cerrar)
         except Exception as error:
             self.enviar_error(socket_atencion, str(error), direccion)
         socket_atencion.close()
-
-    def responder(self, socket, direccion, tipo_operacion):
-        for i in range(0, INTENTOS_CONEXION):
-            try:
-                logging.info("Respondiendo mensaje hello")
-                tipo = TipoMensaje.HOLA + tipo_operacion
-                hello_response_msg = Mensaje(tipo, 1, 1, None)
-                hello_response_pkg = Traductor.MensajeAPaquete(hello_response_msg)
-                socket.sendto(hello_response_pkg, direccion)
-
-                logging.debug("Esperando paquete HELLO ACK...")
-                socket.settimeout(TIMEOUT_SEGUNDOS)
-
-                paquete_recibido, serverAddress = socket.recvfrom(2048)
-                mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
-
-                if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA_ACK:
-                    logging.debug("Paquete HELLO ACK recibido")
-                    break
-
-            except TimeoutError as e:
-                if i < INTENTOS_CONEXION - 1:
-                    logging.debug("Timeout: reenvio de paquete HELLO RESPONSE...")
-                else:
-                    logging.info("No se pudo establecer la conexion")
-
     
     def enviar_error(self, socket, error, direccion):
         logging.info("Enviando mensaje de error")

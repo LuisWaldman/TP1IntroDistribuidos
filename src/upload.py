@@ -6,13 +6,10 @@ import logging
 from src.conexion import Conexion
 from src.conexion.Emisor import Emisor
 from src.utils.parametros import Parametros
-from src.mensajes.mensaje import TipoMensaje, Mensaje
-from src.utils.Traductor import Traductor
+from src.mensajes.mensaje import TipoMensaje
 from src.utils.signal import sigint_exit
 from src.utils.log import set_up_log
 
-TIMEOUT_SEGUNDOS = 2
-INTENTOS_CONEXION = 5
 exit_code = 0
 
 param = Parametros(sys.argv)
@@ -54,46 +51,12 @@ signal.signal(signal.SIGINT, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-logging.info("Iniciando comunicacion")
-tipo_mensaje = TipoMensaje.HOLA + TipoMensaje.UPLOAD
-primer_mensaje = Mensaje(tipo_mensaje, 1, 1, param.filename)
-primer_paquete = Traductor.MensajeAPaquete(primer_mensaje)
-
-for i in range(0, INTENTOS_CONEXION):
-    try:
-        clientSocket.sendto(primer_paquete, (param.ip, param.port))
-        logging.debug("Esperando paquete HELLO...")
-        clientSocket.settimeout(TIMEOUT_SEGUNDOS)
-
-        paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
-        logging.debug("Paquete HELLO recibido")
-        mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
-        termino_archivo = False
-        break
-
-    except TimeoutError as e:
-        if i < INTENTOS_CONEXION-1:
-            logging.debug("Timeout: reenvio de paquete HELLO...")
-        else:
-            logging.info("No se pudo establecer la conexion")
-            clientSocket.close()
-            exit(5)
-
-if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
-    Conexion.hello_ack(clientSocket, serverAddress)
+(conexion_establecida, serverAddress) = Conexion.establecer_conexion(clientSocket, (param.ip, param.port), param.filename, TipoMensaje.UPLOAD)
+if conexion_establecida:
     logging.debug("Enviando archivo...")
     emisor = Emisor(clientSocket, param.path + param.filename, serverAddress, param.protocoloN)
     emisor.enviar_archivo()
     emisor.cerrar_conexion()
-elif mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:
-    logging.info("Error: " + mensaje_recibido.payload)
-    exit_code = 4
-else:
-    logging.info(
-        f"Error: tipo de mensaje {TipoMensaje(mensaje_recibido.tipo_mensaje).name} inesperado."
-    )
-    exit_code = 5
-# todo cerrar conexion
 
 clientSocket.close()
 logging.info("Comunicación terminada")
