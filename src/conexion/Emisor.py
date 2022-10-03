@@ -34,7 +34,6 @@ class Emisor:
             self.package += 1
             self.lock.release()
 
-            # todo corregir esto
             if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
                 break
 
@@ -97,7 +96,6 @@ class Emisor:
             if self.reinicio:
                 self.reiniciar_transferencia(self.direccion)
 
-            # todo corregir
             if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
                 logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
                 return
