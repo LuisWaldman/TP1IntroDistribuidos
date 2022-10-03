@@ -82,7 +82,7 @@ for i in range(0, INTENTOS_CONEXION):
 if mensaje_recibido.tipo_mensaje == TipoMensaje.HOLA:
     Conexion.hello_ack(clientSocket, serverAddress)
     logging.debug("Enviando archivo...")
-    emisor = Emisor(clientSocket, param.path + param.filename, serverAddress)
+    emisor = Emisor(clientSocket, param.path + param.filename, serverAddress, param.protocoloN)
     emisor.enviar_archivo()
     emisor.cerrar_conexion()
 elif mensaje_recibido.tipo_mensaje == TipoMensaje.ERROR:

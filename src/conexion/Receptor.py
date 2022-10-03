@@ -18,6 +18,7 @@ class Receptor:
     def recibir_archivo(self):
         termino_archivo = False
 
+        logging.debug("Abriendo archivo en path " + self.file_path)
         with open(self.file_path, "wb") as file_destino:
             desfragmentador = Desfragmentador(file_destino, self.MAX_PAYLOAD)
 

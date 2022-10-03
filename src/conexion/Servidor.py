@@ -43,10 +43,10 @@ class Servidor:
                 logging.info(error)
                 self.lock.release()
                 raise Exception(error)
-            archivo = Archivo(self.dirpath + mensaje.payload)
-            existe = archivo.existe()
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 logging.info("Conexión de tipo DOWNLOAD")
+                archivo = Archivo(self.dirpath + mensaje.payload.split(",")[0])
+                existe = archivo.existe()
                 if not existe:
                     error = "El archivo solicitado no existe"
                     logging.info(error)
@@ -55,6 +55,8 @@ class Servidor:
                 logging.info("Archivo solicitado existente")
             elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
                 logging.info("Conexión de tipo UPLOAD")
+                archivo = Archivo(self.dirpath + mensaje.payload)
+                existe = archivo.existe()
                 if existe:
                     error = "El archivo ofrecido existente"
                     logging.info(error)
@@ -90,7 +92,7 @@ class Servidor:
             if mensaje.tipo_operacion == TipoMensaje.DOWNLOAD:
                 logging.info("Atendiendo: cliente=receptor servidor=emisor")
                 emisor = Emisor(
-                    socket_atencion, self.dirpath + mensaje.payload, direccion
+                    socket_atencion, self.dirpath + mensaje.payload.split(",")[0], direccion, int(mensaje.payload.split(",")[1])
                 )
                 emisor.enviar_archivo()
                 emisor.cerrar_conexion()
