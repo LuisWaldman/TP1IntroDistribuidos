@@ -67,7 +67,7 @@ class Mensaje:
         self.calcular_checksum_complemento(checksum_dos_bytes)
 
     def calcular_sum_payload(self):
-        if type(self.payload) != type(b'abc123'):  # todo corregir esto: el fragmentador devuelve bytes no es necesario encodear en ese caso
+        if not isinstance(self.payload, bytes):
             payload = self.payload.encode('utf-8')
         else:
             payload = self.payload
@@ -75,12 +75,12 @@ class Mensaje:
         h = hashlib.sha256()
         h.update(payload)
         payload_bytes = h.digest()
-        bytes = []
+        data_bytes = []
         sum = 0
 
         for i in range(0, 16):
-            bytes.append(int.from_bytes(payload_bytes[2 * i:2 * i + 2], byteorder='big'))
-        for i in bytes:
+            data_bytes.append(int.from_bytes(payload_bytes[2 * i:2 * i + 2], byteorder='big'))
+        for i in data_bytes:
             sum += i
         return sum
 

@@ -20,7 +20,7 @@ class Traductor:
             .to_bytes(2, byteorder='big', signed=False)
 
         # Payload MAX 64 KB
-        if type(mensaje.payload) != type(b'abc123'):  # todo corregir esto: el fragmentador devuelve bytes no es necesario encodear en ese caso
+        if not isinstance(mensaje.payload, bytes):
             payload = mensaje.payload.encode('utf-8') if int(mensaje.tamanio_payload) > 0 else None
         else:
             payload = mensaje.payload if int(mensaje.tamanio_payload) > 0 else None
