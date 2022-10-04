@@ -3,7 +3,7 @@ directorioservidor="/home/luis/archivos/"
 archivo="videosubir.mp4"
 
 rm $directorioservidor$archivo
-python3 src/upload.py -n $archivo -d $directorioupload;
+python3.10 src/upload.py -v -n $archivo -d $directorioupload;
 
 md5subida=$(md5sum $directorioupload$archivo)
 md5original=$(md5sum $directorioservidor$archivo)

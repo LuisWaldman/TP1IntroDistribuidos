@@ -3,7 +3,7 @@ directorioservidor="/home/luis/archivos/"
 archivo="video1.mp4"
 
 rm $directoriodownload$archivo
-python3 src/download.py -n $archivo -d $directoriodownload;
+python3.10 src/download.py -v -n $archivo -d $directoriodownload;
 
 md5descarga=$(md5sum $directoriodownload$archivo)
 md5original=$(md5sum $directorioservidor$archivo)
