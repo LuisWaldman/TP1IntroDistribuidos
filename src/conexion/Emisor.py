@@ -9,69 +9,72 @@ from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.fragmentador import Fragmentador
 from src.utils.Traductor import Traductor
 
-
 class Emisor:
-    N = 5
     MAX_PAYLOAD = 64000
     MAX_REENVIOS_SEGUIDOS = 30
     MAX_INTENTOS_CHAU = 5
+    TIMEOUT = 0.25
 
     def __init__(self, socket, file_path, direccion, protocolo_N):
         self.file_path = file_path
         self.direccion = direccion
         self.socket = socket
-        self.socket.settimeout(2)  # segundos
+        self.socket.settimeout(self.TIMEOUT)  # segundos
         self.lock = threading.Lock()
         self.package = 1
         self.ack_esperado = 1
         self.reenvios_seguidos = 0
-        self.reinicio = False
         self.conexion_perdida = False
         self.N = protocolo_N
+        self.en_vuelo = 0
 
-    def enviar_mensajes(self, frag, num_packages):
-        while self.package <= num_packages and self.ack_esperado <= num_packages:
+    def enviar_paquetes(self, frag, num_packages):
+        while self.ack_esperado <= num_packages:
             self.lock.acquire()
-            package_aux = self.package
-            self.package += 1
+            if self.package <= num_packages and self.ack_esperado <= num_packages and (0 < (self.N - self.en_vuelo) <= self.N):
+                self.en_vuelo += 1
+                aux_package = self.package
+                self.package += 1
+                data = frag.get_bytes_from_file(aux_package)
+                self.lock.release()
+
+                logging.debug(f"Enviando paquete numero {aux_package}")
+                tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD
+                msg = Mensaje(tipo, num_packages, aux_package, data)
+                pkg = Traductor.MensajeAPaquete(msg)
+                self.socket.sendto(pkg, self.direccion)
+                continue
             self.lock.release()
 
-            if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
-                self.conexion_perdida = True
-                break
+            if self.conexion_perdida:
+                return
 
-            logging.debug(f"Enviando paquete numero {package_aux}")
-            data = frag.get_bytes_from_file(package_aux)
-            tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD
-            logging.debug(f'package {package_aux} data size: {len(data)}')
-            msg = Mensaje(tipo, num_packages, package_aux, data)
-            pkg = Traductor.MensajeAPaquete(msg)
-            self.socket.sendto(pkg, self.direccion)
+    def recibir_acks(self):
+        if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+            self.conexion_perdida = True
+            return
 
-            try:
-                message, direccion = self.socket.recvfrom(2048)
-            except timeout:
-                logging.debug(f'Timeout paquete {self.ack_esperado}')
-                if self.reinicio:
-                    break
+        try:
+            message, direccion = self.socket.recvfrom(2048)
+        except timeout:
+            logging.debug(f'Timeout paquete {self.ack_esperado}')
+            self.lock.acquire()
+            self.en_vuelo = 0
+            self.package = self.ack_esperado
+            self.lock.release()
+            self.reenvios_seguidos += 1
+            return
 
-                if package_aux >= self.ack_esperado:
-                    self.lock.acquire()
-                    self.package = self.ack_esperado
-                    self.reenvios_seguidos += 1
-                    self.lock.release()
-                continue
-
-            mensaje = Traductor.PaqueteAMensaje(message, False)
-            if mensaje.tipo_mensaje == TipoMensaje.ACK and mensaje.parte >= self.ack_esperado:
-                logging.debug(f"Recibi el ack del paquete {mensaje.parte}")
-                self.lock.acquire()
-                self.ack_esperado = mensaje.parte + 1
-                self.reenvios_seguidos = 0
-                self.lock.release()
-            elif mensaje.tipo_mensaje == TipoMensaje.HOLA:
-                self.reinicio = True
-                break
+        mensaje = Traductor.PaqueteAMensaje(message, False)
+        if mensaje.tipo_mensaje == TipoMensaje.ACK and mensaje.parte >= self.ack_esperado:
+            logging.debug(f"Recibi el ack del paquete {mensaje.parte}")
+            self.lock.acquire()
+            self.ack_esperado = mensaje.parte + 1
+            self.en_vuelo -= 1
+            self.lock.release()
+            self.reenvios_seguidos = 0
+        elif mensaje.tipo_mensaje == TipoMensaje.HOLA:
+            self.reiniciar_transferencia(direccion)
 
     def enviar_archivo(self):
         with open(self.file_path, "rb") as file_origen:
@@ -87,19 +90,19 @@ class Emisor:
             hilos_hijos = list()
             for i in range(self.N):
                 hilo = threading.Thread(
-                    target=self.enviar_mensajes,
+                    target=self.enviar_paquetes,
                     args=(frag, num_packages)
                 )
                 hilos_hijos.append(hilo)
                 hilo.start()
 
+            while self.ack_esperado <= num_packages and not self.conexion_perdida:
+                self.recibir_acks()
+
             for hilo in hilos_hijos:
                 hilo.join()
 
-            if self.reinicio:
-                self.reiniciar_transferencia(self.direccion)
-
-            if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+            if self.conexion_perdida:
                 logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
                 return
 
@@ -110,7 +113,7 @@ class Emisor:
         self.package = 1
         self.ack_esperado = 1
         self.reenvios_seguidos = 0
-        self.reinicio = False
+        self.en_vuelo = 0
         Conexion.enviar_hello_ack(self.socket, direccion)
 
     def cerrar_conexion(self):
