@@ -3,7 +3,6 @@ import hashlib
 
 
 class TipoMensaje(enum.IntEnum):
-    NODEFINIDO = 0
     HOLA = 1
     CHAU = 2
     PARTE = 3
@@ -18,11 +17,6 @@ class TipoMensaje(enum.IntEnum):
 
 
 class Mensaje:
-    tipo = TipoMensaje.NODEFINIDO
-    total_partes = 0
-    parte = 0
-    tamanio_payload = 0
-    payload = ""
     checksum = 0
     checksum_complemento = 0
 
