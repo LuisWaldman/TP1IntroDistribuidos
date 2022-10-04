@@ -9,6 +9,7 @@ from src.mensajes.mensaje import TipoMensaje, Mensaje
 from src.utils.fragmentador import Fragmentador
 from src.utils.Traductor import Traductor
 
+
 class Emisor:
     MAX_PAYLOAD = 64000
     MAX_REENVIOS_SEGUIDOS = 30
@@ -123,15 +124,15 @@ class Emisor:
         conexion_cerrada = False
         intento = 1
         while not conexion_cerrada and intento <= self.MAX_INTENTOS_CHAU:
-            logging.info(
+            logging.debug(
                 "Enviando mensaje CHAU (intento: "
                 f"{intento}/{self.MAX_INTENTOS_CHAU})..."
             )
             msg = Mensaje(TipoMensaje.CHAU, 0, 0, "")
             pkg = Traductor.mensaje_a_paquete(msg)
             self.socket.sendto(pkg, self.direccion)
-            logging.info("Mensaje CHAU enviado.")
-            logging.info("Esperando ACK...")
+            logging.debug("Mensaje CHAU enviado.")
+            logging.debug("Esperando ACK...")
             try:
                 paquete_recibido, __ = self.socket.recvfrom(64010)
                 mensaje_recibido = Traductor.paquete_a_mensaje(
@@ -140,7 +141,7 @@ class Emisor:
                 )
                 if mensaje_recibido.tipo == TipoMensaje.ACK:
                     conexion_cerrada = True
-                    logging.info("ACK recibido. Conexion cerrada")
+                    logging.debug("ACK recibido. Conexion cerrada")
                 else:
                     logging.debug(
                         f"El tipo de mensaje {mensaje_recibido.tipo} "

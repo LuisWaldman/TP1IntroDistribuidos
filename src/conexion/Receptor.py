@@ -54,6 +54,7 @@ class Receptor:
                 if mensaje_recibido.tipo_mensaje == TipoMensaje.CHAU and termino_archivo:
                     self.cierre_conexion_ack(serverAddress)
                     conectado = False
+                    logging.info('archivo recibido exitosamente')
                     continue
 
                 elif not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte <= self.package_esperado):
@@ -90,7 +91,7 @@ class Receptor:
         Conexion.enviar_hello_ack(self.socket, direccion)
 
     def cierre_conexion_ack(self, direccion):
-        logging.info("Cierre de conexión recibido.")
+        logging.debug("Cierre de conexión recibido.")
         logging.debug("Enviando ACK...")
         msg = Mensaje(TipoMensaje.ACK, 0, 0, None)
         pkg = Traductor.mensaje_a_paquete(msg)
