@@ -18,6 +18,9 @@ def establecer_conexion(socket, address, filename, tipo_mensaje):
             logging.debug("Paquete recibido")
             msg = Traductor.PaqueteAMensaje(pkg, False)
 
+            if msg.tipo_mensaje == TipoMensaje.ERROR:
+                logging.info("Error " + msg.payload.decode())
+                return (False, None)
             if msg.tipo_mensaje != TipoMensaje.HOLA:
                 continue
 
