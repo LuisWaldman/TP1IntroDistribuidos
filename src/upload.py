@@ -5,6 +5,7 @@ import logging
 
 from src.conexion import Conexion
 from src.conexion.Emisor import Emisor
+from src.utils.Archivo import Archivo
 from src.utils.parametros import Parametros
 from src.mensajes.mensaje import TipoMensaje
 from src.utils.signal import sigint_exit
@@ -47,7 +48,12 @@ logging.debug("port:" + str(param.port))
 logging.debug("path:" + str(param.path))
 logging.debug("filename:" + str(param.filename))
 
-signal.signal(signal.SIGINT, sigint_exit)
+archivo = Archivo(param.path + param.filename)
+if not archivo.existe():
+    logging.info("El archivo que se intenta subir no existe")
+    exit(exit_code)
+
+signal.signal(param.path, sigint_exit)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 

@@ -12,7 +12,7 @@ class Parametros:
     port = 10666
     path = "."
     filename = ""
-    protocoloN = 10
+    protocoloN = 1
     error = False
 
     def __init__(self, parametros):
