@@ -16,10 +16,10 @@ def establecer_conexion(socket, address, filename, tipo_mensaje):
         try:
             pkg, serverAddres = socket.recvfrom(2048)
             logging.debug("Paquete recibido")
-            msg = Traductor.paquete_a_mensaje(pkg, False)
+            msg = Traductor.paquete_a_mensaje(pkg, True)
 
             if msg.tipo_mensaje == TipoMensaje.ERROR:
-                logging.info("Error " + msg.payload.decode())
+                logging.info("Error " + msg.payload)
                 return (False, None)
             if msg.tipo_mensaje != TipoMensaje.HOLA:
                 continue

@@ -132,7 +132,11 @@ class Servidor:
                     receptor.recibir_archivo()
 
         except Exception as error:
-            self.enviar_error(socket_atencion, str(error), direccion)
+            if error == 'Conexión interrumpida. No se reciben nuevos paquetes':
+                logging.info(error)
+            else:
+                self.enviar_error(socket_atencion, str(error), direccion)
+            logging.debug("Comunicación terminada")
         socket_atencion.close()
 
     def enviar_error(self, socket, error, direccion):

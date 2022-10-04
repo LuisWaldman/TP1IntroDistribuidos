@@ -10,11 +10,13 @@ from src.utils.Traductor import Traductor
 class Receptor:
     MAX_PAYLOAD = 64000
     MAX_INTENTOS_CHAU = 5
+    TIMEOUT_RECEPTOR = 30
 
     def __init__(self, socket, file_path):
         self.file_path = file_path
         self.socket = socket
         self.package_esperado = 1
+        self.socket.settimeout(self.TIMEOUT_RECEPTOR)
 
     def recibir_archivo(self):
         conectado = True
@@ -26,7 +28,12 @@ class Receptor:
 
             while conectado:
                 logging.debug("Esperando paquete...")
-                paquete_recibido, serverAddress = self.socket.recvfrom(64010)  # todo hace cte (? o traer de archivo conf
+                try:
+                    paquete_recibido, serverAddress = self.socket.recvfrom(64010)  # todo hace cte (? o traer de archivo conf
+                except timeout:
+                    raise Exception('Conexión interrumpida. No se reciben nuevos paquetes')
+                    return
+
                 logging.debug("Paquete recibido")
                 mensaje_recibido = Traductor.paquete_a_mensaje(
                     paquete_recibido,
@@ -88,3 +95,4 @@ class Receptor:
         msg = Mensaje(TipoMensaje.ACK, 0, 0, None)
         pkg = Traductor.mensaje_a_paquete(msg)
         self.socket.sendto(pkg, direccion)
+        logging.debug("Comunicación terminada")

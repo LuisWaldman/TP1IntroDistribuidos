@@ -58,7 +58,11 @@ if conexion_establecida:
     receptor = Receptor(
         clientSocket, param.path + param.filename
     )
-    receptor.recibir_archivo()
+    try:
+        receptor.recibir_archivo()
+
+    except Exception as error:
+        logging.info(error)
 
 clientSocket.close()
 logging.info("Comunicación terminada.")
