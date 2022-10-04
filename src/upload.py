@@ -47,8 +47,9 @@ logging.debug("IP:" + str(param.ip))
 logging.debug("port:" + str(param.port))
 logging.debug("path:" + str(param.path))
 logging.debug("filename:" + str(param.filename))
+logging.debug("Valor de N para GBN:" + str(param.protocoloN))
 
-signal.signal(param.path, sigint_exit)
+signal.signal(signal.SIGINT, sigint_exit)
 
 archivo = Archivo(param.path + param.filename)
 if not archivo.existe():
