@@ -1,5 +1,5 @@
-directorioupload="/home/luis/archivosparasubir/"
-directorioservidor="/home/luis/archivos/"
+directorioupload=$HOME/archivosparasubir/
+directorioservidor=$HOME/archivos/
 archivo="videosubir.mp4"
 
 rm $directorioservidor$archivo

@@ -1,5 +1,5 @@
-directoriodownload="/home/luis/archivodescarga/"
-directorioservidor="/home/luis/archivos/"
+directoriodownload=$HOME/archivodescarga/
+directorioservidor=$HOME/archivos/
 archivo="video1.mp4"
 
 rm $directoriodownload$archivo
