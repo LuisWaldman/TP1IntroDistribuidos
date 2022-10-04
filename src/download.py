@@ -62,7 +62,7 @@ if conexion_establecida:
         receptor.recibir_archivo()
 
     except Exception as error:
-        logging.info(error)
+        logging.error(error)
 
 clientSocket.close()
 logging.info("Comunicación terminada.")

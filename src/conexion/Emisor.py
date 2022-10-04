@@ -104,7 +104,7 @@ class Emisor:
                 hilo.join()
 
             if self.conexion_perdida:
-                logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
+                logging.error('Conexión interrumpida. Máximo de reenvios alcanzado')
             else:
                 logging.info('archivo enviado exitosamente')
             self.cerrar_conexion()

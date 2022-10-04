@@ -53,7 +53,7 @@ signal.signal(signal.SIGINT, sigint_exit)
 
 archivo = Archivo(param.path + param.filename)
 if not archivo.existe():
-    logging.info("El archivo que se intenta subir no existe")
+    logging.error("El archivo que se intenta subir no existe")
     exit(5)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
