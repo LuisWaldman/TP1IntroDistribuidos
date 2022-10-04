@@ -26,6 +26,7 @@ class Emisor:
         self.ack_esperado = 1
         self.reenvios_seguidos = 0
         self.reinicio = False
+        self.conexion_perdida = False
         self.N = protocolo_N
 
     def enviar_mensajes(self, frag, num_packages):
@@ -36,6 +37,7 @@ class Emisor:
             self.lock.release()
 
             if self.reenvios_seguidos > self.MAX_REENVIOS_SEGUIDOS:
+                self.conexion_perdida = True
                 break
 
             logging.debug(f"Enviando paquete numero {package_aux}")
@@ -112,7 +114,9 @@ class Emisor:
         Conexion.enviar_hello_ack(self.socket, direccion)
 
     def cerrar_conexion(self):
-        logging.info("Enviando mensaje CHAU...")
+        if self.conexion_perdida:
+            logging.debug("No se envía mensaje CHAU. Conexión perdida.")
+            return
         conexion_cerrada = False
         intento = 0
         while not conexion_cerrada and intento < self.MAX_INTENTOS_CHAU:
