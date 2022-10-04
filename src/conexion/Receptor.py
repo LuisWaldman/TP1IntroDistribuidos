@@ -17,13 +17,14 @@ class Receptor:
         self.package_esperado = 1
 
     def recibir_archivo(self):
+        conectado = True
         termino_archivo = False
 
         logging.debug("Abriendo archivo en path " + self.file_path)
         with open(self.file_path, "wb") as file_destino:
             desfragmentador = Desfragmentador(file_destino, self.MAX_PAYLOAD)
 
-            while not termino_archivo:
+            while conectado:
                 logging.debug("Esperando paquete...")
                 paquete_recibido, serverAddress = self.socket.recvfrom(64010)  # todo hace cte (? o traer de archivo conf
                 logging.debug("Paquete recibido")
@@ -43,7 +44,12 @@ class Receptor:
                     self.reiniciar_transferencia(serverAddress)
                     continue
 
-                if not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte <= self.package_esperado):
+                if mensaje_recibido.tipo_mensaje == TipoMensaje.CHAU and termino_archivo:
+                    self.cierre_conexion_ack(serverAddress)
+                    conectado = False
+                    continue
+
+                elif not (mensaje_recibido.tipo_mensaje == TipoMensaje.PARTE and mensaje_recibido.parte <= self.package_esperado):
                     logging.debug("Descartado parte no esperada")
                     continue
 
@@ -70,39 +76,15 @@ class Receptor:
                 self.socket.sendto(paquete_ack, serverAddress)
                 if mensaje_recibido.parte == mensaje_recibido.total_partes:
                     termino_archivo = True
-        return serverAddress
 
     def reiniciar_transferencia(self, direccion):
         logging.info("Reiniciando tranferencia de archivo")
         self.package_esperado = 1
         Conexion.enviar_hello_ack(self.socket, direccion)
 
-    def esperar_cierre_conexion(self, direccion):
-        closed = False
-        intento = 0
-        while not closed and intento < self.MAX_INTENTOS_CHAU:
-            logging.info(
-                "Esperando cierre de conexión (intento: "
-                f"{intento}/{self.MAX_INTENTOS_CHAU})..."
-            )
-            try:
-                paquete_recibido, __ = self.socket.recvfrom(64010)
-                mensaje_recibido = Traductor.PaqueteAMensaje(
-                    paquete_recibido,
-                    False
-                )
-                if mensaje_recibido.tipo == TipoMensaje.CHAU:
-                    logging.info("Cierre de conexión recibido.")
-                    closed = True
-                    logging.debug("Enviando ACK...")
-                    msg = Mensaje(TipoMensaje.ACK, 0, 0, "")
-                    pkg = Traductor.MensajeAPaquete(msg)
-                    self.socket.sendto(pkg, direccion)
-                else:
-                    logging.debug(
-                        f"El tipo de mensaje {mensaje_recibido.tipo} "
-                        "recibido no fue CHAU."
-                    )
-                    intento = intento + 1
-            except timeout:
-                intento = intento + 1
+    def cierre_conexion_ack(self, direccion):
+        logging.info("Cierre de conexión recibido.")
+        logging.debug("Enviando ACK...")
+        msg = Mensaje(TipoMensaje.ACK, 0, 0, None)
+        pkg = Traductor.MensajeAPaquete(msg)
+        self.socket.sendto(pkg, direccion)

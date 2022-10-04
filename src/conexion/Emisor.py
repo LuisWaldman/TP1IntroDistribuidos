@@ -104,9 +104,9 @@ class Emisor:
 
             if self.conexion_perdida:
                 logging.info('Conexión interrumpida. Máximo de reenvios alcanzado')
-                return
-
-            logging.info('archivo enviado exitosamente')
+            else:
+                logging.info('archivo enviado exitosamente')
+            self.cerrar_conexion()
 
     def reiniciar_transferencia(self, direccion):
         logging.info("Reiniciando tranferencia de archivo")
@@ -121,8 +121,8 @@ class Emisor:
             logging.debug("No se envía mensaje CHAU. Conexión perdida.")
             return
         conexion_cerrada = False
-        intento = 0
-        while not conexion_cerrada and intento < self.MAX_INTENTOS_CHAU:
+        intento = 1
+        while not conexion_cerrada and intento <= self.MAX_INTENTOS_CHAU:
             logging.info(
                 "Enviando mensaje CHAU (intento: "
                 f"{intento}/{self.MAX_INTENTOS_CHAU})..."

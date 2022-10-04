@@ -124,16 +124,13 @@ class Servidor:
                         socket_atencion, self.dirpath + mensaje.payload, direccion, self.N
                     )
                     emisor.enviar_archivo()
-                    emisor.cerrar_conexion()
                 elif mensaje.tipo_operacion == TipoMensaje.UPLOAD:
                     logging.info("Atendiendo: cliente=emisor servidor=receptor")
                     receptor = Receptor(
                         socket_atencion, self.dirpath + mensaje.payload
                     )
-                    direccion_a_cerrar = receptor.recibir_archivo()
-                    if not direccion_a_cerrar == direccion:
-                        logging.info(f"{direccion_a_cerrar} != {direccion}")
-                    receptor.esperar_cierre_conexion(direccion_a_cerrar)
+                    receptor.recibir_archivo()
+
         except Exception as error:
             self.enviar_error(socket_atencion, str(error), direccion)
         socket_atencion.close()

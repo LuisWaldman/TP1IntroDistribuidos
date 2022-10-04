@@ -56,7 +56,6 @@ if conexion_establecida:
     logging.debug("Enviando archivo...")
     emisor = Emisor(clientSocket, param.path + param.filename, serverAddress, param.protocoloN)
     emisor.enviar_archivo()
-    emisor.cerrar_conexion()
 
 clientSocket.close()
 logging.info("Comunicación terminada")
