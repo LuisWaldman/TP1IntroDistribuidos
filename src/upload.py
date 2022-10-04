@@ -48,12 +48,12 @@ logging.debug("port:" + str(param.port))
 logging.debug("path:" + str(param.path))
 logging.debug("filename:" + str(param.filename))
 
+signal.signal(param.path, sigint_exit)
+
 archivo = Archivo(param.path + param.filename)
 if not archivo.existe():
     logging.info("El archivo que se intenta subir no existe")
-    exit(exit_code)
-
-signal.signal(param.path, sigint_exit)
+    exit(5)
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
