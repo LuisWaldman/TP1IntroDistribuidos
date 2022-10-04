@@ -56,7 +56,7 @@ for i in range(0, INTENTOS_CONEXION):
 
         paquete_recibido, serverAddress = clientSocket.recvfrom(2048)
         logging.debug("Paquete respuesta recibido")
-        mensaje_recibido = Traductor.PaqueteAMensaje(paquete_recibido, True)
+        mensaje_recibido = Traductor.paquete_a_mensaje(paquete_recibido, True)
         print(mensaje_recibido.payload)
         break
 

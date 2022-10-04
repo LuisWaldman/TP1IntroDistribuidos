@@ -12,7 +12,7 @@ payload = 'abcde'
 
 mensaje = Mensaje(tipo_msg, total_partes, parte, payload)
 paquete = Traductor.MensajeAPaquete(mensaje)
-mensaje_retraducido = Traductor.PaqueteAMensaje(paquete)
+mensaje_retraducido = Traductor.paquete_a_mensaje(paquete)
 
 assert mensaje_retraducido.tipo_mensaje == TipoMensaje.HOLA
 assert mensaje_retraducido.tipo_operacion == TipoMensaje.DOWNLOAD

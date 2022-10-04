@@ -16,7 +16,7 @@ def establecer_conexion(socket, address, filename, tipo_mensaje):
         try:
             pkg, serverAddres = socket.recvfrom(2048)
             logging.debug("Paquete recibido")
-            msg = Traductor.PaqueteAMensaje(pkg, False)
+            msg = Traductor.paquete_a_mensaje(pkg, False)
 
             if msg.tipo_mensaje == TipoMensaje.ERROR:
                 logging.info("Error " + msg.payload.decode())
@@ -44,7 +44,7 @@ def responder_conexion(socket, address, tipo_mensaje):
         try:
             pkg, clientAddres = socket.recvfrom(2048)
             logging.debug("Paquete recibido")
-            msg = Traductor.PaqueteAMensaje(pkg, False)
+            msg = Traductor.paquete_a_mensaje(pkg, False)
 
             if msg.tipo_mensaje != TipoMensaje.HOLA_ACK:
                 continue

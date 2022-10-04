@@ -111,7 +111,7 @@ class Servidor:
             raise Exception(error)
 
     def atender_cliente(self, paquete, direccion):
-        mensaje = Traductor.PaqueteAMensaje(paquete, True)
+        mensaje = Traductor.paquete_a_mensaje(paquete, True)
         socket_atencion = socket(AF_INET, SOCK_DGRAM)
         try:
             self.assert_message(mensaje, direccion)

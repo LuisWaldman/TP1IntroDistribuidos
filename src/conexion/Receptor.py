@@ -28,7 +28,7 @@ class Receptor:
                 logging.debug("Esperando paquete...")
                 paquete_recibido, serverAddress = self.socket.recvfrom(64010)  # todo hace cte (? o traer de archivo conf
                 logging.debug("Paquete recibido")
-                mensaje_recibido = Traductor.PaqueteAMensaje(
+                mensaje_recibido = Traductor.paquete_a_mensaje(
                     paquete_recibido,
                     False
                 )

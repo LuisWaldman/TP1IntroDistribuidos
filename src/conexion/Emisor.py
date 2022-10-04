@@ -65,7 +65,7 @@ class Emisor:
             self.reenvios_seguidos += 1
             return
 
-        mensaje = Traductor.PaqueteAMensaje(message, False)
+        mensaje = Traductor.paquete_a_mensaje(message, False)
         if mensaje.tipo_mensaje == TipoMensaje.ACK and mensaje.parte >= self.ack_esperado:
             logging.debug(f"Recibi el ack del paquete {mensaje.parte}")
             self.lock.acquire()
@@ -134,7 +134,7 @@ class Emisor:
             logging.info("Esperando ACK...")
             try:
                 paquete_recibido, __ = self.socket.recvfrom(64010)
-                mensaje_recibido = Traductor.PaqueteAMensaje(
+                mensaje_recibido = Traductor.paquete_a_mensaje(
                     paquete_recibido,
                     False
                 )

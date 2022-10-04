@@ -27,7 +27,7 @@ def copiar_archivo():
 
                 mensajeparte = Mensaje(TipoMensaje.PARTE, num_packages, package, bytes_leidos)
                 paqueteparte = Traductor.MensajeAPaquete(mensajeparte)
-                mensaje_retraducido = Traductor.PaqueteAMensaje(paqueteparte, False)
+                mensaje_retraducido = Traductor.paquete_a_mensaje(paqueteparte, False)
 
                 aux = desfrag.set_bytes_to_file(mensaje_retraducido.payload, package)
                 print(f'Se escribieron {aux} bytes en {path_destino}\n')

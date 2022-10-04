@@ -29,7 +29,7 @@ class Traductor:
             else tipo_msg + total_partes + parte + tamanio_payload + checksum
 
     @staticmethod
-    def PaqueteAMensaje(bytes, convertir_string):
+    def paquete_a_mensaje(bytes, convertir_string):
         # Cabecera
         tipo_msg = bytes[0]
         total_partes = bytes[1]
