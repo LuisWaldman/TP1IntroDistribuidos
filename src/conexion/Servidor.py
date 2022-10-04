@@ -83,7 +83,7 @@ class Servidor:
         misarchivos = Archivo.Archivos(self.dirpath)
         mensajelistado = Mensaje(tipo, 1, 1, misarchivos)
 
-        listado_pkg = Traductor.MensajeAPaquete(mensajelistado)
+        listado_pkg = Traductor.mensaje_a_paquete(mensajelistado)
         socket_listado = socket(AF_INET, SOCK_DGRAM)
         socket_listado.sendto(listado_pkg, direccion)
         socket_listado.close()
@@ -138,7 +138,7 @@ class Servidor:
     def enviar_error(self, socket, error, direccion):
         logging.info("Enviando mensaje de error")
         error_msg = Mensaje(TipoMensaje.ERROR, 1, 1, error)
-        error_pkg = Traductor.MensajeAPaquete(error_msg)
+        error_pkg = Traductor.mensaje_a_paquete(error_msg)
         socket.sendto(error_pkg, direccion)
 
     def detener_hilos_clientes(self):

@@ -65,7 +65,7 @@ def enviar_hello(socket, address, filename, tipo_mensaje):
     logging.debug("Enviando paquete HELLO...")
     tipo = TipoMensaje.HOLA + tipo_mensaje
     msg = Mensaje(tipo, 1, 1, filename)
-    pkg = Traductor.MensajeAPaquete(msg)
+    pkg = Traductor.mensaje_a_paquete(msg)
     socket.sendto(pkg, address)
 
 
@@ -73,7 +73,7 @@ def enviar_hello_response(socket, address, tipo_mensaje):
     logging.debug("Enviando paquete HELLO RESPONSE...")
     tipo = TipoMensaje.HOLA + tipo_mensaje
     msg = Mensaje(tipo, 1, 1, None)
-    pkg = Traductor.MensajeAPaquete(msg)
+    pkg = Traductor.mensaje_a_paquete(msg)
     socket.sendto(pkg, address)
 
 
@@ -81,5 +81,5 @@ def enviar_hello_ack(socket, address):
     logging.debug("Enviando paquete HELLO ACK...")
     tipo = TipoMensaje.HOLA_ACK + TipoMensaje.DOWNLOAD
     msg_hello_ack = Mensaje(tipo, 1, 1, None)
-    pkg_hello_ack = Traductor.MensajeAPaquete(msg_hello_ack)
+    pkg_hello_ack = Traductor.mensaje_a_paquete(msg_hello_ack)
     socket.sendto(pkg_hello_ack, address)

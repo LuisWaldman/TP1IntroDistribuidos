@@ -41,7 +41,7 @@ class Emisor:
                 logging.debug(f"Enviando paquete numero {aux_package}")
                 tipo = TipoMensaje.PARTE + TipoMensaje.DOWNLOAD
                 msg = Mensaje(tipo, num_packages, aux_package, data)
-                pkg = Traductor.MensajeAPaquete(msg)
+                pkg = Traductor.mensaje_a_paquete(msg)
                 self.socket.sendto(pkg, self.direccion)
                 continue
             self.lock.release()
@@ -128,7 +128,7 @@ class Emisor:
                 f"{intento}/{self.MAX_INTENTOS_CHAU})..."
             )
             msg = Mensaje(TipoMensaje.CHAU, 0, 0, "")
-            pkg = Traductor.MensajeAPaquete(msg)
+            pkg = Traductor.mensaje_a_paquete(msg)
             self.socket.sendto(pkg, self.direccion)
             logging.info("Mensaje CHAU enviado.")
             logging.info("Esperando ACK...")

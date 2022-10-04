@@ -71,7 +71,7 @@ class Receptor:
                     None
                 )
 
-                paquete_ack = Traductor.MensajeAPaquete(mensaje_ack)
+                paquete_ack = Traductor.mensaje_a_paquete(mensaje_ack)
                 logging.debug(f"Envia ACK parte {mensaje_recibido.parte}")
                 self.socket.sendto(paquete_ack, serverAddress)
                 if mensaje_recibido.parte == mensaje_recibido.total_partes:
@@ -86,5 +86,5 @@ class Receptor:
         logging.info("Cierre de conexión recibido.")
         logging.debug("Enviando ACK...")
         msg = Mensaje(TipoMensaje.ACK, 0, 0, None)
-        pkg = Traductor.MensajeAPaquete(msg)
+        pkg = Traductor.mensaje_a_paquete(msg)
         self.socket.sendto(pkg, direccion)

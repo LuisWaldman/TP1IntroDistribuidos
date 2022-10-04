@@ -7,7 +7,7 @@ SUM_CHECKSUM = 65535
 
 class Traductor:
     @staticmethod
-    def MensajeAPaquete(mensaje):
+    def mensaje_a_paquete(mensaje):
         # Cabecera
         tipo_msg = int(mensaje.tipo).to_bytes(1, byteorder='big', signed=False)
         total_partes = int(mensaje.total_partes) \
