@@ -54,7 +54,9 @@ if Conexion.establecer_conexion(clientSocket,
                                 param.filename,
                                 TipoMensaje.DOWNLOAD):
     logging.debug("Recibiendo archivo...")
-    receptor = Receptor(clientSocket, param.path + param.filename)
+    receptor = Receptor(
+        clientSocket, param.path + "downloaded" + param.filename
+    )
     direccion = receptor.recibir_archivo()
     receptor.esperar_cierre_conexion(direccion)
 
