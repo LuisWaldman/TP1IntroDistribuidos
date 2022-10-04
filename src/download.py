@@ -56,7 +56,7 @@ clientSocket = socket(AF_INET, SOCK_DGRAM)
 if conexion_establecida:
     logging.debug("Recibiendo archivo...")
     receptor = Receptor(
-        clientSocket, param.path + "downloaded" + param.filename
+        clientSocket, param.path + param.filename
     )
     receptor.recibir_archivo()
 
