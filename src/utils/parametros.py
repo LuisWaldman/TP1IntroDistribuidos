@@ -27,12 +27,12 @@ class Parametros:
             elif par == "-q":
                 self.enum_salida = "WARN"
                 cargando = ""
-            elif par in ('-H', '-p', '-s', '-d', '-n', '-pr'):
+            elif par in ('-H', '-p', '-s', '-d', '-n', '-N'):
                 cargando = par
             else:
                 if cargando == "-H":
                     self.ip = par
-                elif cargando == "-pr":
+                elif cargando == "-N":
                     self.protocoloN = int(par)
                 elif cargando == "-p":
                     self.port = int(par)

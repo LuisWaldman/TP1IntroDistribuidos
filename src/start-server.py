@@ -19,6 +19,7 @@ if param.mostrar_ayuda:
     print("-H , -- host service IP address")
     print("-p , -- port service port")
     print("-s , -- storage storage dir path")
+    print("-N , -- tamaño de ráfaga para GBN. Default es 1, i.e stop and wait")
     exit(0)
 elif param.error:
     print("usage : start - server [ - h ] [ - v | -q ] [ - H ADDR ] "
@@ -29,9 +30,9 @@ signal.signal(signal.SIGINT, sigint_exit)
 set_up_log(param.enum_salida)
 
 logging.debug("IP:" + str(param.ip))
-logging.debug("port:" + str(param.port))
-logging.debug("path:" + str(param.path))
-logging.debug("filename:" + str(param.filename))
+logging.debug("Port:" + str(param.port))
+logging.debug("Path:" + str(param.path))
+logging.debug("Valor de N para GBN:" + str(param.protocoloN))
 
 
 logging.info('Iniciando servidor')
