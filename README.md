@@ -51,6 +51,6 @@ Descargar e instalar [GO](https://go.dev/doc/install) e instalar
 
 ```bash
 PATH="$HOME/go/bin/:/usr/local/go/bin:$PATH"
-comcast --device=lo0 --packet-loss=10%
+comcast --device=lo --packet-loss=10% --target-addr=127.0.0.0/8 --target-proto=udp
 comcast --stop
 ```
